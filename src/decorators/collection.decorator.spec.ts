@@ -1,7 +1,25 @@
+import { IClassDecoratorOptionsDefault } from '../interfaces/class-options.interface';
 import { ARANGO_COLLECTION } from '../type-arangodb.constant';
 import { Collection } from './collection.decorator';
 
 describe('CollectionDecorator', () => {
+  const metadataValue: IClassDecoratorOptionsDefault[] = [
+    {
+      name: 'CollectionTest',
+      type: 'document',
+      waitForSync: false,
+      schema: {
+        message: '',
+        level: 'none',
+        rule: {
+          properties: {},
+          additionalProperties: { type: 'null' },
+          required: [],
+        },
+      },
+    },
+  ];
+
   describe('getOwnMetadata', () => {
     test('get metadata of class without params', async () => {
       /**
@@ -10,9 +28,6 @@ describe('CollectionDecorator', () => {
       @Collection()
       class CollectionTest {}
       const collectionTest = new CollectionTest();
-      const metadataValue = [
-        { name: 'CollectionTest', type: 'document', waitForSync: false },
-      ];
 
       /**
        * Act
@@ -35,9 +50,6 @@ describe('CollectionDecorator', () => {
       @Collection('CollectionTest')
       class CollectionTest {}
       const collectionTest = new CollectionTest();
-      const metadataValue = [
-        { name: 'CollectionTest', type: 'document', waitForSync: false },
-      ];
 
       /**
        * Act
@@ -57,12 +69,17 @@ describe('CollectionDecorator', () => {
       /**
        * Arrange
        */
-      @Collection('CollectionTest', { type: 'edge', waitForSync: true })
+      @Collection('CollectionTest', {
+        type: 'document',
+        waitForSync: false,
+        schema: {
+          message: '',
+          level: 'none',
+          additionalProperties: 'null',
+        },
+      })
       class CollectionTest {}
       const collectionTest = new CollectionTest();
-      const metadataValue = [
-        { name: 'CollectionTest', type: 'edge', waitForSync: true },
-      ];
 
       /**
        * Act
