@@ -1,13 +1,10 @@
-import { Database } from 'arangojs';
+import { CollectionType, Database } from 'arangojs';
 import { Config } from 'arangojs/connection';
 import {
   IClassDecoratorOptionsDefault,
   IRule,
 } from '../interfaces/class-options.interface';
-import {
-  ARANGO_COLLECTION,
-  ARANGO_PROPERTIES,
-} from '../type-arangodb.constant';
+import { ARANGO_COLLECTION, ARANGO_RULES } from '../type-arangodb.constant';
 
 export const clientFactory = async ({
   options,
@@ -25,7 +22,7 @@ export const clientFactory = async ({
     const { name, type, waitForSync, schema } = classMetadata;
 
     const [propertyMetadata]: IRule[] = Reflect.getMetadata(
-      ARANGO_PROPERTIES,
+      ARANGO_RULES,
       collection.prototype,
     );
 
@@ -35,18 +32,24 @@ export const clientFactory = async ({
       required: propertyMetadata.required,
     };
 
-    if (type === 'document') {
-      await db.createCollection(name, {
+    /**
+     * Se debe agregar una factory para repositorios.
+     *
+     * Se debe agregar un nuevo decorador para agregar indices.
+     */
+    const newCollection = db.collection(name);
+    const isExitsCollection = await newCollection.exists();
+
+    if (!isExitsCollection) {
+      await newCollection.create({
+        type:
+          type === 'document'
+            ? CollectionType.DOCUMENT_COLLECTION
+            : CollectionType.EDGE_COLLECTION,
         waitForSync,
         schema: { ...schema, rule },
       });
     }
-
-    if (type === 'edge')
-      await db.createEdgeCollection(name, {
-        waitForSync,
-        schema: { ...schema, rule },
-      });
   }
 
   return db;
