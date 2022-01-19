@@ -1,11 +1,12 @@
 import 'reflect-metadata';
+import { IRule } from '../interfaces/class-options.interface';
 import {
   IBasePropertyDecoratorTypeArray,
   IBasePropertyDecoratorTypeNumber,
   IBasePropertyDecoratorTypeObject,
   IBasePropertyDecoratorTypeString,
 } from '../interfaces/property-options.interface';
-import { ARANGO_PROPERTIES } from '../type-arangodb.constant';
+import { ARANGO_RULES } from '../type-arangodb.constant';
 
 export function Field(type: SchemaType): PropertyDecoratorType;
 export function Field(
@@ -34,8 +35,8 @@ export function Field(
 
     const properties = { ...options };
 
-    const propertiesMetadata = Reflect.getOwnMetadata(
-      ARANGO_PROPERTIES,
+    const propertiesMetadata: IRule[] = Reflect.getOwnMetadata(
+      ARANGO_RULES,
       target.constructor.prototype,
     ) || [{ properties: {}, required: [] }];
 
@@ -45,13 +46,13 @@ export function Field(
         [property]: properties,
       },
       required: [
-        ...propertiesMetadata[0].required,
+        ...(propertiesMetadata[0].required ?? []),
         ...(requiredField ? [property] : []),
       ],
     };
 
     Reflect.defineMetadata(
-      ARANGO_PROPERTIES,
+      ARANGO_RULES,
       propertiesMetadata,
       target.constructor.prototype,
     );

@@ -1,4 +1,4 @@
-import { ARANGO_PROPERTIES } from '../type-arangodb.constant';
+import { ARANGO_RULES } from '../type-arangodb.constant';
 import { Collection } from './collection.decorator';
 import { Field } from './field.decorator';
 
@@ -31,7 +31,7 @@ describe('FieldDecorator', () => {
        * Act
        */
       const result = Reflect.getOwnMetadata(
-        ARANGO_PROPERTIES,
+        ARANGO_RULES,
         collectionTest.constructor.prototype,
       );
 
@@ -68,7 +68,7 @@ describe('FieldDecorator', () => {
        * Act
        */
       const result = Reflect.getOwnMetadata(
-        ARANGO_PROPERTIES,
+        ARANGO_RULES,
         collectionTest.constructor.prototype,
       );
 
