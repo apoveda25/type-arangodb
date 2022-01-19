@@ -67,7 +67,7 @@ export interface IRule {
   /**
    * Data type used to validate properties that are not defined in 'properties'.
    */
-  additionalProperties: { type: SchemaType };
+  additionalProperties?: { type: SchemaType };
 
   /**
    * Definition of the required properties in each document of the collection.

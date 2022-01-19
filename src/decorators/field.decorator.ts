@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { IRule } from '../interfaces/class-options.interface';
 import {
   IBasePropertyDecoratorTypeArray,
   IBasePropertyDecoratorTypeNumber,
@@ -34,7 +35,7 @@ export function Field(
 
     const properties = { ...options };
 
-    const propertiesMetadata = Reflect.getOwnMetadata(
+    const propertiesMetadata: IRule[] = Reflect.getOwnMetadata(
       ARANGO_PROPERTIES,
       target.constructor.prototype,
     ) || [{ properties: {}, required: [] }];
@@ -45,7 +46,7 @@ export function Field(
         [property]: properties,
       },
       required: [
-        ...propertiesMetadata[0].required,
+        ...(propertiesMetadata[0].required ?? []),
         ...(requiredField ? [property] : []),
       ],
     };
