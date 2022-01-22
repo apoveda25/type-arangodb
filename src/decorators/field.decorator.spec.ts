@@ -56,7 +56,12 @@ describe('FieldDecorator', () => {
       ];
       @Collection()
       class CollectionTest {
-        @Field({ type: 'string', minLength: 3, maxLength: 20 })
+        @Field({
+          type: 'string',
+          minLength: 3,
+          maxLength: 20,
+          requiredField: true,
+        })
         propertyTest1?: string;
 
         @Field({ type: 'number', minimum: 0, maximun: 9 })
