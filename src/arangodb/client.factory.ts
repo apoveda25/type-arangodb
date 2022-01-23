@@ -34,8 +34,6 @@ export const clientFactory = async ({
 
     /**
      * Se debe agregar una factory para repositorios.
-     *
-     * Se debe agregar un nuevo decorador de propiedad (Field) para agregar propiedades al esquema.
      */
     const newCollection = db.collection(name);
     const isExitsCollection = await newCollection.exists();

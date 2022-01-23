@@ -1,30 +1,33 @@
 import 'reflect-metadata';
-import { IRule } from '../interfaces/collection.interface';
 import {
-  IBasePropertyDecoratorTypeArray,
-  IBasePropertyDecoratorTypeNumber,
-  IBasePropertyDecoratorTypeObject,
-  IBasePropertyDecoratorTypeString,
-} from '../interfaces/property-options.interface';
-import { ARANGO_RULES } from '../type-arangodb.constant';
+  IFieldDecoratorTypeArray,
+  IFieldDecoratorTypeBoolean,
+  IFieldDecoratorTypeNumber,
+  IFieldDecoratorTypeObject,
+  IFieldDecoratorTypeString,
+  IRule,
+} from '../interfaces/field.interface';
+import { ARANGO_FIELD } from '../type-arangodb.constant';
 
 export function Field(type: SchemaType): PropertyDecoratorType;
 export function Field(
   options:
-    | IBasePropertyDecoratorTypeNumber
-    | IBasePropertyDecoratorTypeString
-    | IBasePropertyDecoratorTypeArray
-    | IBasePropertyDecoratorTypeObject,
+    | IFieldDecoratorTypeBoolean
+    | IFieldDecoratorTypeNumber
+    | IFieldDecoratorTypeString
+    | IFieldDecoratorTypeArray
+    | IFieldDecoratorTypeObject,
 ): PropertyDecoratorType;
 export function Field(
   typeOrOptions:
     | SchemaType
-    | IBasePropertyDecoratorTypeNumber
-    | IBasePropertyDecoratorTypeString
-    | IBasePropertyDecoratorTypeArray
-    | IBasePropertyDecoratorTypeObject,
+    | IFieldDecoratorTypeBoolean
+    | IFieldDecoratorTypeNumber
+    | IFieldDecoratorTypeString
+    | IFieldDecoratorTypeArray
+    | IFieldDecoratorTypeObject,
 ): PropertyDecoratorType {
-  return function (target: Function | Object, property: string) {
+  return function (target: Function | Object, field: string) {
     const options =
       typeof typeOrOptions === 'string'
         ? { type: typeOrOptions, requiredField: false }
@@ -33,27 +36,34 @@ export function Field(
     const { requiredField } = options;
     delete options.requiredField;
 
-    const properties = { ...options };
+    const fieldsOptions = { [field]: options } as Record<
+      string,
+      | IFieldDecoratorTypeBoolean
+      | IFieldDecoratorTypeNumber
+      | IFieldDecoratorTypeString
+      | IFieldDecoratorTypeArray
+      | IFieldDecoratorTypeObject
+    >;
 
-    const propertiesMetadata: IRule[] = Reflect.getOwnMetadata(
-      ARANGO_RULES,
+    const fieldsMetadata: IRule = Reflect.getOwnMetadata(
+      ARANGO_FIELD,
       target.constructor.prototype,
-    ) || [{ properties: {}, required: [] }];
+    ) || { properties: {} };
 
-    propertiesMetadata[0] = {
+    const rulesField: IRule = {
       properties: {
-        ...propertiesMetadata[0].properties,
-        [property]: properties,
+        ...fieldsMetadata.properties,
+        ...fieldsOptions,
       },
       required: [
-        ...(propertiesMetadata[0].required ?? []),
-        ...(requiredField ? [property] : []),
+        ...(fieldsMetadata.required ?? []),
+        ...(requiredField ? [field] : []),
       ],
     };
 
     Reflect.defineMetadata(
-      ARANGO_RULES,
-      propertiesMetadata,
+      ARANGO_FIELD,
+      rulesField,
       target.constructor.prototype,
     );
   };

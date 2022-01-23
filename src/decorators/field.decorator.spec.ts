@@ -1,4 +1,5 @@
-import { ARANGO_RULES } from '../type-arangodb.constant';
+import { IRule } from '../interfaces/field.interface';
+import { ARANGO_FIELD } from '../type-arangodb.constant';
 import { Collection } from './collection.decorator';
 import { Field } from './field.decorator';
 
@@ -8,22 +9,20 @@ describe('FieldDecorator', () => {
       /**
        * Arrange
        */
-      const metadataValue = [
-        {
-          properties: {
-            propertyTest1: { type: 'string' },
-            propertyTest2: { type: 'number' },
-          },
-          required: [],
+      const metadataValue: IRule = {
+        properties: {
+          propertyTest1: { type: 'string' },
+          propertyTest2: { type: 'number' },
         },
-      ];
+        required: [],
+      };
       @Collection()
       class CollectionTest {
         @Field('string')
         propertyTest1?: string;
 
         @Field('number')
-        propertyTest2?: string;
+        propertyTest2?: number;
       }
       const collectionTest = new CollectionTest();
 
@@ -31,7 +30,7 @@ describe('FieldDecorator', () => {
        * Act
        */
       const result = Reflect.getOwnMetadata(
-        ARANGO_RULES,
+        ARANGO_FIELD,
         collectionTest.constructor.prototype,
       );
 
@@ -45,15 +44,13 @@ describe('FieldDecorator', () => {
       /**
        * Arrange
        */
-      const metadataValue = [
-        {
-          properties: {
-            propertyTest1: { type: 'string', minLength: 3, maxLength: 20 },
-            propertyTest2: { type: 'number', minimum: 0, maximun: 9 },
-          },
-          required: [],
+      const metadataValue: IRule = {
+        properties: {
+          propertyTest1: { type: 'string', minLength: 3, maxLength: 20 },
+          propertyTest2: { type: 'number', minimum: 0, maximun: 9 },
         },
-      ];
+        required: ['propertyTest1'],
+      };
       @Collection()
       class CollectionTest {
         @Field({
@@ -73,7 +70,7 @@ describe('FieldDecorator', () => {
        * Act
        */
       const result = Reflect.getOwnMetadata(
-        ARANGO_RULES,
+        ARANGO_FIELD,
         collectionTest.constructor.prototype,
       );
 
