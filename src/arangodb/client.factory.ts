@@ -3,7 +3,7 @@ import { Config } from 'arangojs/connection';
 import {
   IClassDecoratorOptionsDefault,
   IRule,
-} from '../interfaces/class-options.interface';
+} from '../interfaces/collection.interface';
 import { ARANGO_COLLECTION, ARANGO_RULES } from '../type-arangodb.constant';
 
 export const clientFactory = async ({

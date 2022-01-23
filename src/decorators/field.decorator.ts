@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { IRule } from '../interfaces/class-options.interface';
+import { IRule } from '../interfaces/collection.interface';
 import {
   IBasePropertyDecoratorTypeArray,
   IBasePropertyDecoratorTypeNumber,
