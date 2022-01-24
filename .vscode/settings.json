@@ -13,5 +13,6 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "iridium.npm.packageManager": "yarn",
-  "iridium.npm.showAnalyzeTab": true
+  "iridium.npm.showAnalyzeTab": true,
+  "docwriter.style": "Auto-detect"
 }

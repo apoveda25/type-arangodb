@@ -1,4 +1,4 @@
-import { IRule } from '../interfaces/field.interface';
+import { IRuleOptionsMetadata } from '../interfaces/field.interface';
 import { ARANGO_FIELD } from '../type-arangodb.constant';
 import { Collection } from './collection.decorator';
 import { Field } from './field.decorator';
@@ -9,7 +9,7 @@ describe('FieldDecorator', () => {
       /**
        * Arrange
        */
-      const metadataValue: IRule = {
+      const metadataValue: IRuleOptionsMetadata = {
         properties: {
           propertyTest1: { type: 'string' },
           propertyTest2: { type: 'number' },
@@ -24,14 +24,13 @@ describe('FieldDecorator', () => {
         @Field('number')
         propertyTest2?: number;
       }
-      const collectionTest = new CollectionTest();
 
       /**
        * Act
        */
       const result = Reflect.getOwnMetadata(
         ARANGO_FIELD,
-        collectionTest.constructor.prototype,
+        CollectionTest.prototype,
       );
 
       /**
@@ -44,7 +43,7 @@ describe('FieldDecorator', () => {
       /**
        * Arrange
        */
-      const metadataValue: IRule = {
+      const metadataValue: IRuleOptionsMetadata = {
         properties: {
           propertyTest1: { type: 'string', minLength: 3, maxLength: 20 },
           propertyTest2: { type: 'number', minimum: 0, maximun: 9 },
@@ -64,14 +63,13 @@ describe('FieldDecorator', () => {
         @Field({ type: 'number', minimum: 0, maximun: 9 })
         propertyTest2?: number;
       }
-      const collectionTest = new CollectionTest();
 
       /**
        * Act
        */
       const result = Reflect.getOwnMetadata(
         ARANGO_FIELD,
-        collectionTest.constructor.prototype,
+        CollectionTest.prototype,
       );
 
       /**

@@ -5,7 +5,7 @@ import {
   IFieldDecoratorTypeNumber,
   IFieldDecoratorTypeObject,
   IFieldDecoratorTypeString,
-  IRule,
+  IRuleOptionsMetadata,
 } from '../interfaces/field.interface';
 import { ARANGO_FIELD } from '../type-arangodb.constant';
 
@@ -45,12 +45,12 @@ export function Field(
       | IFieldDecoratorTypeObject
     >;
 
-    const fieldsMetadata: IRule = Reflect.getOwnMetadata(
+    const fieldsMetadata: IRuleOptionsMetadata = Reflect.getOwnMetadata(
       ARANGO_FIELD,
       target.constructor.prototype,
     ) || { properties: {} };
 
-    const rulesField: IRule = {
+    const rulesField: IRuleOptionsMetadata = {
       properties: {
         ...fieldsMetadata.properties,
         ...fieldsOptions,

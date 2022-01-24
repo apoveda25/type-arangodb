@@ -1,6 +1,7 @@
 import { Database } from 'arangojs';
 import { Collection } from '../decorators/collection.decorator';
 import { Field } from '../decorators/field.decorator';
+import { Schema } from '../decorators/schema.decorator';
 import { clientFactory } from './client.factory';
 
 describe('ClientFactory', () => {
@@ -8,12 +9,8 @@ describe('ClientFactory', () => {
     /**
      * Arrange
      */
-    @Collection('CollectionTest', {
-      schema: {
-        message: '',
-        level: 'moderate',
-      },
-    })
+    @Collection()
+    @Schema('moderate')
     class CollectionTest {
       @Field('string')
       propertyTest1?: string;

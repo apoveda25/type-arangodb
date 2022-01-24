@@ -1,9 +1,10 @@
-import { ICollectionOptions } from '../interfaces/collection.interface';
+import 'reflect-metadata';
+import { ICollectionOptionsMetadata } from '../interfaces/collection.interface';
 import { ARANGO_COLLECTION } from '../type-arangodb.constant';
 import { Collection } from './collection.decorator';
 
 describe('CollectionDecorator', () => {
-  const metadataValue: ICollectionOptions = {
+  const metadataValue: ICollectionOptionsMetadata = {
     name: 'CollectionTest',
     type: 'document',
   };

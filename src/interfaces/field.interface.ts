@@ -128,7 +128,7 @@ export interface IFieldDecoratorTypeObject extends IBaseFieldDecorator {
   dependentRequired?: Record<string, string[]>;
 }
 
-export interface IRule {
+export interface IRuleOptionsMetadata {
   /**
    * Definition of the properties of each document in the collection.
    */

@@ -12,3 +12,10 @@ export interface ICollectionOptions
    */
   name?: string;
 }
+
+export interface ICollectionOptionsMetadata extends ICollectionOptions {
+  /**
+   * Collection name. By default it takes the name of the decorated class.
+   */
+  name: string;
+}

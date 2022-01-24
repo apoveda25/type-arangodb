@@ -1,3 +1,6 @@
+import { ValidationLevel } from 'arangojs/collection';
+import { IRuleOptionsMetadata } from './field.interface';
+
 export interface IBaseSchema {
   /**
    * Message displayed when a schema validation error is generated.
@@ -9,7 +12,7 @@ export interface IBaseSchema {
    * The level that controls when validation is triggered.
    * More information here -> https://www.arangodb.com/docs/stable/data-modeling-documents-schema-validation.html#levels
    */
-  level: SchemaLevel;
+  level: ValidationLevel;
 }
 
 export interface ISchemaOptions extends IBaseSchema {
@@ -17,4 +20,8 @@ export interface ISchemaOptions extends IBaseSchema {
    * Data type used to validate properties that are not defined in 'properties'.
    */
   additionalProperties?: SchemaType;
+}
+
+export interface ISchemaOptionsMetadata extends IBaseSchema {
+  rule: IRuleOptionsMetadata;
 }
