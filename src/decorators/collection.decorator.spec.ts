@@ -1,25 +1,28 @@
+import 'reflect-metadata';
+import { ICollectionOptionsMetadata } from '../interfaces/collection.interface';
 import { ARANGO_COLLECTION } from '../type-arangodb.constant';
 import { Collection } from './collection.decorator';
 
 describe('CollectionDecorator', () => {
+  const metadataValue: ICollectionOptionsMetadata = {
+    name: 'CollectionTest',
+    type: 'document',
+  };
+
   describe('getOwnMetadata', () => {
-    test('get metadata of class without params', async () => {
+    test('get metadata of Collection decorator in class without params', async () => {
       /**
        * Arrange
        */
       @Collection()
       class CollectionTest {}
-      const collectionTest = new CollectionTest();
-      const metadataValue = [
-        { name: 'CollectionTest', type: 'document', waitForSync: false },
-      ];
 
       /**
        * Act
        */
       const result = Reflect.getOwnMetadata(
         ARANGO_COLLECTION,
-        collectionTest.constructor.prototype,
+        CollectionTest.prototype,
       );
 
       /**
@@ -28,23 +31,19 @@ describe('CollectionDecorator', () => {
       expect(result).toEqual(metadataValue);
     });
 
-    test('get metadata of class with name', async () => {
+    test('get metadata of Collection decorator in class with param name', async () => {
       /**
        * Arrange
        */
       @Collection('CollectionTest')
       class CollectionTest {}
-      const collectionTest = new CollectionTest();
-      const metadataValue = [
-        { name: 'CollectionTest', type: 'document', waitForSync: false },
-      ];
 
       /**
        * Act
        */
       const result = Reflect.getOwnMetadata(
         ARANGO_COLLECTION,
-        collectionTest.constructor.prototype,
+        CollectionTest.prototype,
       );
 
       /**
@@ -53,23 +52,40 @@ describe('CollectionDecorator', () => {
       expect(result).toEqual(metadataValue);
     });
 
-    test('get metadata of class with name', async () => {
+    test('get metadata of Collection decorator in class with param options', async () => {
       /**
        * Arrange
        */
-      @Collection('CollectionTest', { type: 'edge', waitForSync: true })
+      @Collection({ type: 'document' })
       class CollectionTest {}
-      const collectionTest = new CollectionTest();
-      const metadataValue = [
-        { name: 'CollectionTest', type: 'edge', waitForSync: true },
-      ];
 
       /**
        * Act
        */
       const result = Reflect.getOwnMetadata(
         ARANGO_COLLECTION,
-        collectionTest.constructor.prototype,
+        CollectionTest.prototype,
+      );
+
+      /**
+       * Assert
+       */
+      expect(result).toEqual(metadataValue);
+    });
+
+    test('get metadata of Collection decorator in class with param options', async () => {
+      /**
+       * Arrange
+       */
+      @Collection({ type: 'document', name: 'CollectionTest' })
+      class CollectionTest {}
+
+      /**
+       * Act
+       */
+      const result = Reflect.getOwnMetadata(
+        ARANGO_COLLECTION,
+        CollectionTest.prototype,
       );
 
       /**
