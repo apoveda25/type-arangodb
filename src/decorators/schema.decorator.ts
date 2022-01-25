@@ -20,22 +20,13 @@ export function Schema(
     const { additionalProperties } = options;
     delete options.additionalProperties;
 
-    const optionsDefault: ISchemaOptionsMetadata =
-      typeof levelOrOptions === 'string'
-        ? {
-            level: levelOrOptions,
-            rule: {
-              properties: {},
-              additionalProperties: { type: additionalProperties ?? 'null' },
-            },
-          }
-        : {
-            ...levelOrOptions,
-            rule: {
-              properties: {},
-              additionalProperties: { type: additionalProperties ?? 'null' },
-            },
-          };
+    const optionsDefault: ISchemaOptionsMetadata = {
+      ...options,
+      rule: {
+        properties: {},
+        additionalProperties: { type: additionalProperties ?? 'null' },
+      },
+    };
 
     const schema: ISchemaOptionsMetadata =
       Reflect.getOwnMetadata(ARANGO_SCHEMA, target.prototype) || {};

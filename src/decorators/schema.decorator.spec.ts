@@ -1,4 +1,4 @@
-import { ISchemaOptions } from '../interfaces/schema.interface';
+import { ISchemaOptionsMetadata } from '../interfaces/schema.interface';
 import { ARANGO_SCHEMA } from '../type-arangodb.constant';
 import { Schema } from './schema.decorator';
 
@@ -8,7 +8,10 @@ describe('SchemaDecorator', () => {
       /**
        * Arrange
        */
-      const metadataValue: ISchemaOptions = { level: 'moderate' };
+      const metadataValue: ISchemaOptionsMetadata = {
+        level: 'moderate',
+        rule: { properties: {}, additionalProperties: { type: 'null' } },
+      };
 
       @Schema('moderate')
       class CollectionTest {}
@@ -31,10 +34,10 @@ describe('SchemaDecorator', () => {
       /**
        * Arrange
        */
-      const metadataValue: ISchemaOptions = {
+      const metadataValue: ISchemaOptionsMetadata = {
         level: 'moderate',
         message: 'Message example',
-        additionalProperties: 'string',
+        rule: { properties: {}, additionalProperties: { type: 'string' } },
       };
 
       @Schema({

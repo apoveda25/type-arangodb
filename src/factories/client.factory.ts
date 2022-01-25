@@ -1,11 +1,12 @@
 import { CollectionType, Database } from 'arangojs';
 import { Config } from 'arangojs/connection';
 import {
-  FulltextIndex,
-  GeoIndex,
-  HashIndex,
-  PersistentIndex,
-  TtlIndex,
+  EnsureFulltextIndexOptions,
+  EnsureGeoIndexOptions,
+  EnsureHashIndexOptions,
+  EnsurePersistentIndexOptions,
+  EnsureSkiplistIndexOptions,
+  EnsureTtlIndexOptions,
 } from 'arangojs/indexes';
 import 'reflect-metadata';
 import { ICollectionOptionsMetadata } from '../interfaces/collection.interface';
@@ -33,18 +34,21 @@ export const clientFactory = async ({
       collection.prototype,
     );
 
+    if (!collectionMetadata) continue;
+
     const schemaMetadata: ISchemaOptionsMetadata = Reflect.getMetadata(
       ARANGO_SCHEMA,
       collection.prototype,
     );
 
     const indexesMetadata: (
-      | FulltextIndex
-      | GeoIndex
-      | HashIndex
-      | PersistentIndex
-      | TtlIndex
-    )[] = Reflect.getMetadata(ARANGO_INDEXES, collection.prototype);
+      | EnsurePersistentIndexOptions
+      | EnsureHashIndexOptions
+      | EnsureSkiplistIndexOptions
+      | EnsureTtlIndexOptions
+      | EnsureFulltextIndexOptions
+      | EnsureGeoIndexOptions
+    )[] = Reflect.getMetadata(ARANGO_INDEXES, collection.prototype) ?? [];
 
     const fieldMetadata: IRuleOptionsMetadata = Reflect.getMetadata(
       ARANGO_FIELD,
@@ -72,9 +76,12 @@ export const clientFactory = async ({
           },
         },
       };
-      console.log('metadata: ', metadata);
 
       await newCollection.create(metadata);
+    }
+
+    for (const index of indexesMetadata) {
+      await newCollection.ensureIndex(index as EnsureGeoIndexOptions);
     }
   }
 
