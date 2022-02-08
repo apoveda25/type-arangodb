@@ -5,7 +5,8 @@
     "types"
   ],
   "compilerOptions": {
-    "module": "esnext",
+    "module": "es2022",
+    "target": "ES2016",
     "lib": [
       "dom",
       "esnext"

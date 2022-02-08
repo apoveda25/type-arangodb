@@ -19,3 +19,5 @@ export interface ICollectionOptionsMetadata extends ICollectionOptions {
    */
   name: string;
 }
+
+export interface IArangoEntity extends Record<string, any> {}
