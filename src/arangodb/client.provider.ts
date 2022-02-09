@@ -5,20 +5,20 @@ import {
   EnsureFulltextIndexOptions,
   EnsureGeoIndexOptions,
   EnsurePersistentIndexOptions,
-  EnsureTtlIndexOptions
+  EnsureTtlIndexOptions,
 } from 'arangojs/indexes';
 import {
-  IArangoEntity,
+  ArangoEntity,
   ICollectionOptionsMetadata,
   IRuleOptionsMetadata,
-  ISchemaOptionsMetadata
+  ISchemaOptionsMetadata,
 } from '..';
 import { ArangoStore } from '../metadata.store';
 import {
   ARANGO_COLLECTION,
   ARANGO_FIELD,
   ARANGO_INDEXES,
-  ARANGO_SCHEMA
+  ARANGO_SCHEMA,
 } from '../type-arangodb.constant';
 import { ArangoRepository } from './repository.provider';
 
@@ -35,21 +35,21 @@ export class ArangoClient {
     return this._database;
   }
 
-  async registerEntities(entities: IArangoEntity[]): Promise<void> {
+  async registerEntities(entities: ArangoEntity[]): Promise<void> {
     this._entities.push(...entities);
 
     for (const entity of entities) {
       const collectionMetadata =
         this._store.getMetadata<ICollectionOptionsMetadata>(
           ARANGO_COLLECTION,
-          entity.prototype,
+          entity.constructor.prototype,
         );
 
       if (!collectionMetadata) continue;
 
       const schemaMetadata = this._store.getMetadata<ISchemaOptionsMetadata>(
         ARANGO_SCHEMA,
-        entity.prototype,
+        entity.constructor,
       );
 
       const indexesMetadata =
@@ -60,11 +60,11 @@ export class ArangoClient {
             | EnsureFulltextIndexOptions
             | EnsureGeoIndexOptions
           )[]
-        >(ARANGO_INDEXES, entity.prototype) ?? [];
+        >(ARANGO_INDEXES, entity.constructor.prototype) ?? [];
 
       const fieldMetadata = this._store.getMetadata<IRuleOptionsMetadata>(
         ARANGO_FIELD,
-        entity.prototype,
+        entity.constructor.prototype,
       );
 
       const newCollection = this._database.collection(collectionMetadata.name);
@@ -95,9 +95,30 @@ export class ArangoClient {
     }
   }
 
-  getRepository(
-    entity: IArangoEntity,
-  ): ArangoRepository<IArangoEntity> {
-    return new ArangoRepository<typeof entity>(this._database, entity, this._store);
+  getRepository<T>(entity: ArangoEntity) {
+    return new ArangoRepository<T>(this._database, entity, this._store);
   }
 }
+
+class EntityTest {
+  name!: string;
+  email!: string;
+  username!: string;
+}
+
+const arangoClient = new ArangoClient({});
+
+const repository = arangoClient.getRepository<EntityTest>(EntityTest);
+
+const a = repository.findOne({
+  filters: { name: { equals: '' }, email: { in: [] } },
+  select: { name: true, username: true },
+});
+
+const b = repository.findMany({
+  filters: { name: { equals: '' }, email: { in: [] } },
+  sort: { name: 'ASC' },
+  select: { name: true, username: true },
+  count: 20,
+  offset: 20,
+});

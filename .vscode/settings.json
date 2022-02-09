@@ -12,7 +12,7 @@
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
-  "iridium.npm.packageManager": "yarn",
+  "iridium.npm.packageManager": "pnpm",
   "iridium.npm.showAnalyzeTab": true,
   "docwriter.style": "Auto-detect"
 }
