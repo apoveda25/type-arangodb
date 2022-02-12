@@ -25,7 +25,10 @@ export class ArangoRepository<T> {
       ARANGO_COLLECTION,
       this._entity.constructor.prototype,
     );
-    this._collection = _database.collection(this._metadata.name);
+
+    this._collection = _database.collection(
+      this._metadata ? this._metadata.name : this._entity.constructor.name,
+    );
   }
 
   async findOne({ filters, select }: IFindOneInput<T>): Promise<T | null> {

@@ -99,26 +99,3 @@ export class ArangoClient {
     return new ArangoRepository<T>(this._database, entity, this._store);
   }
 }
-
-class EntityTest {
-  name!: string;
-  email!: string;
-  username!: string;
-}
-
-const arangoClient = new ArangoClient({});
-
-const repository = arangoClient.getRepository<EntityTest>(EntityTest);
-
-const a = repository.findOne({
-  filters: { name: { equals: '' }, email: { in: [] } },
-  select: { name: true, username: true },
-});
-
-const b = repository.findMany({
-  filters: { name: { equals: '' }, email: { in: [] } },
-  sort: { name: 'ASC' },
-  select: { name: true, username: true },
-  count: 20,
-  offset: 20,
-});
