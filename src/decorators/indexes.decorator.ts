@@ -1,40 +1,31 @@
-import {
-  EnsureFulltextIndexOptions,
-  EnsureGeoIndexOptions,
-  EnsureHashIndexOptions,
-  EnsurePersistentIndexOptions,
-  EnsureSkiplistIndexOptions,
-  EnsureTtlIndexOptions,
-} from 'arangojs/indexes';
-import 'reflect-metadata';
+import { ArangoStore } from '../metadata.store';
 import { ARANGO_INDEXES } from '../type-arangodb.constant';
+import {
+  ArangoCreateIndexOption,
+  ArangoIndexDecoratorOption,
+} from '../types/indexes.type';
 
 export function Indexes(
-  ...indexes: (
-    | EnsurePersistentIndexOptions
-    | EnsureHashIndexOptions
-    | EnsureSkiplistIndexOptions
-    | EnsureTtlIndexOptions
-    | EnsureFulltextIndexOptions
-    | EnsureGeoIndexOptions
-  )[]
+  ...indexes: ArangoIndexDecoratorOption[]
 ): ClassDecoratorType {
   return function (target: Function) {
-    const indexesMetadata: (
-      | EnsurePersistentIndexOptions
-      | EnsureHashIndexOptions
-      | EnsureSkiplistIndexOptions
-      | EnsureTtlIndexOptions
-      | EnsureFulltextIndexOptions
-      | EnsureGeoIndexOptions
-    )[] = Reflect.getOwnMetadata(ARANGO_INDEXES, target.prototype) || [];
-    indexesMetadata.push(
-      ...indexes.map((index) => ({
+    const indexesMetadata =
+      ArangoStore.getMetadata<ArangoCreateIndexOption[]>(
+        ARANGO_INDEXES,
+        target.prototype,
+      ) ?? [];
+
+    const indexesCreateOptions: ArangoCreateIndexOption[] = indexes.map(
+      (index) => ({
         ...index,
         name: index.name ?? index.fields.join('-'),
-      })),
+      }),
     );
 
-    Reflect.defineMetadata(ARANGO_INDEXES, indexesMetadata, target.prototype);
+    ArangoStore.setMetadata<ArangoCreateIndexOption[]>(
+      ARANGO_INDEXES,
+      target.prototype,
+      [...indexesMetadata, ...indexesCreateOptions],
+    );
   };
 }

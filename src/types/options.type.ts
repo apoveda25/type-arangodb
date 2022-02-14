@@ -1,4 +1,3 @@
-declare type CollectionType = 'document' | 'edge';
 declare type SchemaType =
   | 'null'
   | 'boolean'

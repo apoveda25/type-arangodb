@@ -1,12 +1,13 @@
-import 'reflect-metadata';
-import { ICollectionOptionsMetadata } from '../interfaces/collection.interface';
+import { CollectionType } from 'arangojs';
+import { IArangoCreateCollectionOptions } from '..';
+import { ArangoStore } from '../metadata.store';
 import { ARANGO_COLLECTION } from '../type-arangodb.constant';
 import { Collection } from './collection.decorator';
 
 describe('CollectionDecorator', () => {
-  const metadataValue: ICollectionOptionsMetadata = {
-    name: 'CollectionTest',
-    type: 'document',
+  const metadataValue: IArangoCreateCollectionOptions = {
+    name: 'EntityTest',
+    type: CollectionType.DOCUMENT_COLLECTION,
   };
 
   describe('getOwnMetadata', () => {
@@ -15,14 +16,14 @@ describe('CollectionDecorator', () => {
        * Arrange
        */
       @Collection()
-      class CollectionTest {}
+      class EntityTest {}
 
       /**
        * Act
        */
-      const result = Reflect.getOwnMetadata(
+      const result = ArangoStore.getMetadata<IArangoCreateCollectionOptions>(
         ARANGO_COLLECTION,
-        CollectionTest.prototype,
+        EntityTest.prototype,
       );
 
       /**
@@ -35,15 +36,15 @@ describe('CollectionDecorator', () => {
       /**
        * Arrange
        */
-      @Collection('CollectionTest')
-      class CollectionTest {}
+      @Collection('EntityTest')
+      class EntityTest {}
 
       /**
        * Act
        */
-      const result = Reflect.getOwnMetadata(
+      const result = ArangoStore.getMetadata<IArangoCreateCollectionOptions>(
         ARANGO_COLLECTION,
-        CollectionTest.prototype,
+        EntityTest.prototype,
       );
 
       /**
@@ -56,15 +57,15 @@ describe('CollectionDecorator', () => {
       /**
        * Arrange
        */
-      @Collection({ type: 'document' })
-      class CollectionTest {}
+      @Collection({ type: CollectionType.DOCUMENT_COLLECTION })
+      class EntityTest {}
 
       /**
        * Act
        */
-      const result = Reflect.getOwnMetadata(
+      const result = ArangoStore.getMetadata<IArangoCreateCollectionOptions>(
         ARANGO_COLLECTION,
-        CollectionTest.prototype,
+        EntityTest.prototype,
       );
 
       /**
@@ -77,15 +78,18 @@ describe('CollectionDecorator', () => {
       /**
        * Arrange
        */
-      @Collection({ type: 'document', name: 'CollectionTest' })
-      class CollectionTest {}
+      @Collection({
+        type: CollectionType.DOCUMENT_COLLECTION,
+        name: 'EntityTest',
+      })
+      class EntityTest {}
 
       /**
        * Act
        */
-      const result = Reflect.getOwnMetadata(
+      const result = ArangoStore.getMetadata<IArangoCreateCollectionOptions>(
         ARANGO_COLLECTION,
-        CollectionTest.prototype,
+        EntityTest.prototype,
       );
 
       /**

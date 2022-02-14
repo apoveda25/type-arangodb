@@ -15,11 +15,11 @@ import { ARANGO_COLLECTION } from '../type-arangodb.constant';
 export class ArangoRepository<T> {
   private readonly _collection: DocumentCollection<T> & EdgeCollection<T>;
   private readonly _metadata: CollectionMetadata;
+  private readonly _store = ArangoStore;
 
   constructor(
     private readonly _database: Database,
     private readonly _entity: ArangoEntity,
-    private readonly _store: ArangoStore,
   ) {
     this._metadata = this._store.getMetadata<CollectionMetadata>(
       ARANGO_COLLECTION,

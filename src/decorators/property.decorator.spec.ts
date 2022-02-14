@@ -1,7 +1,8 @@
-import { IRuleOptionsMetadata } from '../interfaces/field.interface';
-import { ARANGO_FIELD } from '../type-arangodb.constant';
+import { Property } from '.';
+import { IArangoRule } from '..';
+import { ArangoStore } from '../metadata.store';
+import { ARANGO_RULES } from '../type-arangodb.constant';
 import { Collection } from './collection.decorator';
-import { Field } from './field.decorator';
 
 describe('FieldDecorator', () => {
   describe('getOwnMetadata', () => {
@@ -9,28 +10,29 @@ describe('FieldDecorator', () => {
       /**
        * Arrange
        */
-      const metadataValue: IRuleOptionsMetadata = {
+      const metadataValue: IArangoRule = {
         properties: {
           propertyTest1: { type: 'string' },
           propertyTest2: { type: 'number' },
         },
         required: [],
       };
+
       @Collection()
-      class CollectionTest {
-        @Field('string')
+      class EntityTest {
+        @Property('string')
         propertyTest1?: string;
 
-        @Field('number')
+        @Property('number')
         propertyTest2?: number;
       }
 
       /**
        * Act
        */
-      const result = Reflect.getOwnMetadata(
-        ARANGO_FIELD,
-        CollectionTest.prototype,
+      const result = ArangoStore.getMetadata(
+        ARANGO_RULES,
+        EntityTest.prototype,
       );
 
       /**
@@ -43,16 +45,17 @@ describe('FieldDecorator', () => {
       /**
        * Arrange
        */
-      const metadataValue: IRuleOptionsMetadata = {
+      const metadataValue: IArangoRule = {
         properties: {
           propertyTest1: { type: 'string', minLength: 3, maxLength: 20 },
           propertyTest2: { type: 'number', minimum: 0, maximun: 9 },
         },
         required: ['propertyTest1'],
       };
+
       @Collection()
-      class CollectionTest {
-        @Field({
+      class EntityTest {
+        @Property({
           type: 'string',
           minLength: 3,
           maxLength: 20,
@@ -60,16 +63,16 @@ describe('FieldDecorator', () => {
         })
         propertyTest1?: string;
 
-        @Field({ type: 'number', minimum: 0, maximun: 9 })
+        @Property({ type: 'number', minimum: 0, maximun: 9 })
         propertyTest2?: number;
       }
 
       /**
        * Act
        */
-      const result = Reflect.getOwnMetadata(
-        ARANGO_FIELD,
-        CollectionTest.prototype,
+      const result = ArangoStore.getMetadata(
+        ARANGO_RULES,
+        EntityTest.prototype,
       );
 
       /**

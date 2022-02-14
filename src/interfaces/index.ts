@@ -1,3 +1,3 @@
 export * from './collection.interface';
-export * from './field.interface';
+export * from './rule.interface';
 export * from './schema.interface';

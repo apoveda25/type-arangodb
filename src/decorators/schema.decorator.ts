@@ -1,40 +1,44 @@
 import { ValidationLevel } from 'arangojs/collection';
-import 'reflect-metadata';
-import {
-  ISchemaOptions,
-  ISchemaOptionsMetadata,
-} from '../interfaces/schema.interface';
+import { IArangoCreateSchemaOptions, IArangoSchemaDecoratorOptions } from '..';
+import { ArangoStore } from '../metadata.store';
 import { ARANGO_SCHEMA } from '../type-arangodb.constant';
 
 export function Schema(level: ValidationLevel): ClassDecoratorType;
-export function Schema(options: ISchemaOptions): ClassDecoratorType;
 export function Schema(
-  levelOrOptions: ValidationLevel | ISchemaOptions,
+  options: IArangoSchemaDecoratorOptions,
+): ClassDecoratorType;
+export function Schema(
+  levelOrOptions: ValidationLevel | IArangoSchemaDecoratorOptions,
 ): ClassDecoratorType {
   return function (target: Function) {
-    const options: ISchemaOptions =
+    const options: IArangoCreateSchemaOptions =
       typeof levelOrOptions === 'string'
-        ? { level: levelOrOptions }
-        : { ...levelOrOptions };
+        ? {
+            level: levelOrOptions,
+            rule: { properties: {} },
+          }
+        : {
+            message: levelOrOptions.message,
+            level: levelOrOptions.level,
+            rule: {
+              properties: {},
+              additionalProperties: levelOrOptions.additionalProperties
+                ? {
+                    type: levelOrOptions.additionalProperties,
+                  }
+                : null,
+            },
+          };
 
-    const { additionalProperties } = options;
-    delete options.additionalProperties;
+    const schema =
+      ArangoStore.getMetadata<IArangoCreateSchemaOptions>(
+        ARANGO_SCHEMA,
+        target.prototype,
+      ) ?? {};
 
-    const optionsDefault: ISchemaOptionsMetadata = {
+    ArangoStore.setMetadata(ARANGO_SCHEMA, target.prototype, {
+      ...schema,
       ...options,
-      rule: {
-        properties: {},
-        additionalProperties: { type: additionalProperties ?? 'null' },
-      },
-    };
-
-    const schema: ISchemaOptionsMetadata =
-      Reflect.getOwnMetadata(ARANGO_SCHEMA, target.prototype) || {};
-
-    Reflect.defineMetadata(
-      ARANGO_SCHEMA,
-      { ...schema, ...optionsDefault },
-      target.prototype,
-    );
+    });
   };
 }
