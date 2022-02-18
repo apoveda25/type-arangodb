@@ -27,7 +27,7 @@ export interface IFilterCondition<T> {
   gt?: T;
   gte?: T;
   contains?: T;
-  search?: T;
+  notContains?: T;
   startsWith?: T;
   endsWith?: T;
 }
@@ -35,7 +35,6 @@ export interface IFilterCondition<T> {
 export interface IFilterOperator<T> extends IFilterCondition<T> {
   AND?: IFilterCondition<T>[];
   OR?: IFilterCondition<T>[];
-  NOT?: IFilterCondition<T>[];
 }
 
 export type SortInput<
