@@ -9,16 +9,22 @@ import {
   FilterInput,
   IFindManyInput,
   IFindOneInput,
+  SelectInput,
+  SortInput,
 } from '../interfaces/find-input.interface';
 import { ArangoStore } from '../metadata.store';
 import { ARANGO_COLLECTION } from '../type-arangodb.constant';
 import { FiltersProvider } from './filters.provider';
+import { SelectProvider } from './select.provider';
+import { SortProvider } from './sort.provider';
 
 export class ArangoRepository<T> {
   private readonly _collection: DocumentCollection<T> & EdgeCollection<T>;
   private readonly _metadata: CollectionMetadata;
   private readonly _store = ArangoStore;
   private readonly _filtersProvider = new FiltersProvider();
+  private readonly _sortProvider = new SortProvider();
+  private readonly _selectProvider = new SelectProvider();
 
   constructor(
     private readonly _database: Database,
@@ -35,14 +41,15 @@ export class ArangoRepository<T> {
   }
 
   async findOne({ filters, select }: IFindOneInput<T>): Promise<T | null> {
+    const node = 'node';
     const cursor = await this._database.query(aql`
-      FOR node IN ${this._collection}
+      FOR ${node} IN ${this._collection}
       ${this._filtersProvider.transform<T>(
         (filters ?? {}) as FilterInput<T>,
-        'node',
+        node,
       )}
       LIMIT 1
-      RETURN KEEP(node, ${aql.literal(select as any)})
+      RETURN KEEP(${node}, ${aql.literal(select as any)})
     `);
 
     return cursor.reduce<T | null>((accu, curr) => curr ?? accu, null);
@@ -55,15 +62,16 @@ export class ArangoRepository<T> {
     count = 10,
     offset = 0,
   }: IFindManyInput<T>) {
+    const node = 'node';
     const cursor = await this._database.query(aql`
-      FOR node IN ${this._collection}
+      FOR ${node} IN ${this._collection}
       ${this._filtersProvider.transform<T>(
         (filters ?? {}) as FilterInput<T>,
-        'node',
+        node,
       )}
-      ${aql.join(sort as any)}
+      ${this._sortProvider.transform<T>(sort as SortInput<T>, node)}
       LIMIT ${aql.literal(`${offset}, ${count}`)}
-      RETURN KEEP(node, ${aql.literal(select as any)})
+      RETURN ${this._selectProvider.transform(select as SelectInput<T>, node)}
     `);
 
     return cursor.map<T>((node) => node);
