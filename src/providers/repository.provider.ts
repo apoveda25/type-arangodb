@@ -49,7 +49,7 @@ export class ArangoRepository<T> {
         node,
       )}
       LIMIT 1
-      RETURN KEEP(${node}, ${aql.literal(select as any)})
+      RETURN ${this._selectProvider.transform(select as SelectInput<T>, node)}
     `);
 
     return cursor.reduce<T | null>((accu, curr) => curr ?? accu, null);
@@ -61,7 +61,7 @@ export class ArangoRepository<T> {
     select,
     count = 10,
     offset = 0,
-  }: IFindManyInput<T>) {
+  }: IFindManyInput<T>): Promise<T[]> {
     const node = 'node';
     const cursor = await this._database.query(aql`
       FOR ${node} IN ${this._collection}

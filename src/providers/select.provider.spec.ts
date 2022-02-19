@@ -1,15 +1,15 @@
-import { SortInput } from '../interfaces/find-input.interface';
-import { SortProvider } from './sort.provider';
+import { SelectInput } from '../interfaces/find-input.interface';
+import { SelectProvider } from './select.provider';
 
-describe('SortProvider', () => {
-  let provider: SortProvider = new SortProvider();
+describe('SelectProvider', () => {
+  let provider: SelectProvider = new SelectProvider();
 
   test('should be defined', () => {
     expect(provider).toBeDefined();
   });
 
   describe('transform', () => {
-    test('should transform sorting', async () => {
+    test('should transform selecting fields', async () => {
       /**
        * Arrange
        */
@@ -20,27 +20,24 @@ describe('SortProvider', () => {
         createdAt!: number;
       }
 
-      const sort: SortInput<EntityTest> = {
-        username: 'ASC',
-        email: 'ASC',
-        createdAt: 'DESC',
+      const select: SelectInput<EntityTest> = {
+        username: true,
+        email: true,
+        createdAt: true,
       };
 
-      const queryExpected =
-        'SORT @value0.@value1 @value2, @value0.@value3 @value2, @value0.@value4 @value5';
+      const queryExpected = 'KEEP(@value0, @value1, @value2, @value3)';
       const bindVarsExpected = {
         value0: 'node',
         value1: 'username',
-        value2: 'ASC',
-        value3: 'email',
-        value4: 'createdAt',
-        value5: 'DESC',
+        value2: 'email',
+        value3: 'createdAt',
       };
 
       /**
        * Act
        */
-      const result = provider.transform(sort, docName);
+      const result = provider.transform(select, docName);
 
       /**
        * Assert
@@ -49,14 +46,13 @@ describe('SortProvider', () => {
       expect(result.bindVars).toEqual(bindVarsExpected);
     });
 
-    test('should transform sorting with param "sort" === {}', async () => {
+    test('should transform selecting with param "select" === {}', async () => {
       /**
        * Arrange
        */
       const docName = 'node';
-
-      const queryExpected = '';
-      const bindVarsExpected = {};
+      const queryExpected = '@value0';
+      const bindVarsExpected = { value0: 'node' };
 
       /**
        * Act

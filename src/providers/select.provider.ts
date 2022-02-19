@@ -4,7 +4,7 @@ import { SelectInput } from '../interfaces/find-input.interface';
 export class SelectProvider {
   transform<T>(select: SelectInput<T>, docName: string): GeneratedAqlQuery {
     const listQuerySelect = Object.entries(select ?? {}).flatMap(
-      ([key, value]) => (value ? aql.literal(key) : []),
+      ([key, value]) => (value ? aql`${key}` : []),
     );
 
     return listQuerySelect.length

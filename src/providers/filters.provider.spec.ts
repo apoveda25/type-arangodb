@@ -69,7 +69,7 @@ describe('FiltersProvider', () => {
       expect(result.bindVars).toEqual(bindVarsExpected);
     });
 
-    test('should transform filters', async () => {
+    test('should transform filters with param "filters" === {}', async () => {
       /**
        * Arrange
        */
