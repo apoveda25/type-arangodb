@@ -40,8 +40,7 @@ export interface IFilterOperator<T> extends IFilterCondition<T> {
 export type SortInput<
   T,
   U = Partial<T>,
-  V = { [K in keyof U]: 'ASC' },
-  W = { [K in keyof U]: 'DESC' },
-> = V | W;
+  V = { [K in keyof U]: 'ASC' | 'DESC' },
+> = V;
 
 export type SelectInput<T, U = Partial<T>, V = { [K in keyof U]: true }> = V;

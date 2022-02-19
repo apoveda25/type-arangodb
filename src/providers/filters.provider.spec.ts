@@ -68,5 +68,25 @@ describe('FiltersProvider', () => {
       expect(result.query).toMatch(queryExpected);
       expect(result.bindVars).toEqual(bindVarsExpected);
     });
+
+    test('should transform filters', async () => {
+      /**
+       * Arrange
+       */
+      const docName = 'node';
+      const queryExpected = '';
+      const bindVarsExpected = {};
+
+      /**
+       * Act
+       */
+      const result = provider.transform({}, docName);
+
+      /**
+       * Assert
+       */
+      expect(result.query).toMatch(queryExpected);
+      expect(result.bindVars).toEqual(bindVarsExpected);
+    });
   });
 });
