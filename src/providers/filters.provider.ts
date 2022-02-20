@@ -88,7 +88,7 @@ export class FiltersProvider {
     operatorValue: ValueFilterOperator;
     key: string;
     docName: string;
-  }): GeneratedAqlQuery | void {
+  }): GeneratedAqlQuery | null {
     if (operatorKey === 'equals')
       return this.equalsTransform(operatorValue as EqualsOperatorValue, {
         key,
@@ -166,6 +166,8 @@ export class FiltersProvider {
         key,
         docName,
       });
+
+    return null;
   }
 
   private buildFilterOperatorQueries({
@@ -176,7 +178,7 @@ export class FiltersProvider {
     entries: EntriesFilterOperator[];
     key: string;
     docName: string;
-  }) {
+  }): GeneratedAqlQuery[] {
     return entries.flatMap(
       ([operatorKey, operatorValue]) =>
         this.buildFilterOperator({
