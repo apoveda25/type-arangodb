@@ -1,7 +1,7 @@
-declare type ClassDecoratorType = <TFunction extends Function>(
+export type ClassDecoratorType = <TFunction extends Function>(
   target: TFunction,
 ) => TFunction | void;
-declare type PropertyDecoratorType = (
+export type PropertyDecoratorType = (
   target: Function | Object,
   propertyKey: string,
 ) => void;

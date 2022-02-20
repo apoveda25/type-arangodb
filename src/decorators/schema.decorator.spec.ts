@@ -1,4 +1,5 @@
-import { ISchemaOptionsMetadata } from '../interfaces/schema.interface';
+import { IArangoCreateSchemaOptions } from '..';
+import { ArangoStore } from '../metadata.store';
 import { ARANGO_SCHEMA } from '../type-arangodb.constant';
 import { Schema } from './schema.decorator';
 
@@ -8,20 +9,20 @@ describe('SchemaDecorator', () => {
       /**
        * Arrange
        */
-      const metadataValue: ISchemaOptionsMetadata = {
+      const metadataValue: IArangoCreateSchemaOptions = {
         level: 'moderate',
-        rule: { properties: {}, additionalProperties: { type: 'null' } },
+        rule: { properties: {} },
       };
 
       @Schema('moderate')
-      class CollectionTest {}
+      class EntityTest {}
 
       /**
        * Act
        */
-      const result = Reflect.getOwnMetadata(
+      const result = ArangoStore.getMetadata<IArangoCreateSchemaOptions>(
         ARANGO_SCHEMA,
-        CollectionTest.prototype,
+        EntityTest.prototype,
       );
 
       /**
@@ -34,7 +35,7 @@ describe('SchemaDecorator', () => {
       /**
        * Arrange
        */
-      const metadataValue: ISchemaOptionsMetadata = {
+      const metadataValue: IArangoCreateSchemaOptions = {
         level: 'moderate',
         message: 'Message example',
         rule: { properties: {}, additionalProperties: { type: 'string' } },
@@ -45,14 +46,14 @@ describe('SchemaDecorator', () => {
         message: 'Message example',
         additionalProperties: 'string',
       })
-      class CollectionTest {}
+      class EntityTest {}
 
       /**
        * Act
        */
-      const result = Reflect.getOwnMetadata(
+      const result = ArangoStore.getMetadata<IArangoCreateSchemaOptions>(
         ARANGO_SCHEMA,
-        CollectionTest.prototype,
+        EntityTest.prototype,
       );
 
       /**
