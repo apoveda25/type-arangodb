@@ -1,28 +1,16 @@
-import {
-  FulltextIndex,
-  GeoIndex,
-  HashIndex,
-  PersistentIndex,
-  TtlIndex,
-} from 'arangojs/indexes';
+import { ArangoStore } from '../metadata.store';
 import { ARANGO_INDEXES } from '../type-arangodb.constant';
+import { ArangoIndexDecoratorOption } from '../types/indexes.type';
 import { Indexes } from './indexes.decorator';
 
 describe('IndexesDecorator', () => {
-  const metadataValue: (
-    | FulltextIndex
-    | GeoIndex
-    | HashIndex
-    | PersistentIndex
-    | TtlIndex
-  )[] = [
+  const metadataValue: ArangoIndexDecoratorOption[] = [
     {
       name: 'TestIndex',
       type: 'persistent',
       fields: ['name'],
       sparse: true,
       unique: true,
-      id: '123456',
     },
   ];
 
@@ -37,16 +25,15 @@ describe('IndexesDecorator', () => {
         fields: ['name'],
         sparse: true,
         unique: true,
-        id: '123456',
       })
-      class CollectionTest {}
+      class EntityTest {}
 
       /**
        * Act
        */
-      const result = Reflect.getOwnMetadata(
+      const result = ArangoStore.getMetadata(
         ARANGO_INDEXES,
-        CollectionTest.prototype,
+        EntityTest.prototype,
       );
 
       /**

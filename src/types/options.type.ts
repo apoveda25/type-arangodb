@@ -1,5 +1,4 @@
-declare type CollectionType = 'document' | 'edge';
-declare type SchemaType =
+export type SchemaType =
   | 'null'
   | 'boolean'
   | 'number'

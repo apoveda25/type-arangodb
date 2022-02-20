@@ -1,34 +1,47 @@
-import 'reflect-metadata';
+import { CollectionType } from 'arangojs';
 import {
-  ICollectionOptions,
-  ICollectionOptionsMetadata,
-} from '../interfaces/collection.interface';
+  IArangoCollectionDecoratorOptions,
+  IArangoCreateCollectionOptions,
+} from '..';
+import { ArangoStore } from '../metadata.store';
 import { ARANGO_COLLECTION } from '../type-arangodb.constant';
+import { ClassDecoratorType } from '../types';
 
 export function Collection(): ClassDecoratorType;
 export function Collection(name: string): ClassDecoratorType;
-export function Collection(options: ICollectionOptions): ClassDecoratorType;
 export function Collection(
-  nameOrOptions?: string | ICollectionOptions,
+  options: IArangoCollectionDecoratorOptions,
+): ClassDecoratorType;
+export function Collection(
+  nameOrOptions?: string | IArangoCollectionDecoratorOptions,
 ): ClassDecoratorType {
   return function (target: Function) {
-    const options: ICollectionOptionsMetadata =
+    const options: IArangoCreateCollectionOptions =
       typeof nameOrOptions === 'string'
-        ? { name: nameOrOptions, type: 'document' }
+        ? { name: nameOrOptions, type: CollectionType.DOCUMENT_COLLECTION }
         : typeof nameOrOptions === 'object'
         ? {
             ...nameOrOptions,
             name: nameOrOptions.name ? nameOrOptions.name : target.name,
           }
-        : { name: target.name, type: 'document' };
+        : {
+            name: target.name,
+            type: CollectionType.DOCUMENT_COLLECTION,
+          };
 
-    const collection: ICollectionOptionsMetadata =
-      Reflect.getOwnMetadata(ARANGO_COLLECTION, target.prototype) || {};
+    const collection =
+      ArangoStore.getMetadata<IArangoCreateCollectionOptions>(
+        ARANGO_COLLECTION,
+        target.prototype,
+      ) ?? {};
 
-    Reflect.defineMetadata(
+    ArangoStore.setMetadata<IArangoCreateCollectionOptions>(
       ARANGO_COLLECTION,
-      { ...collection, ...options },
       target.prototype,
+      {
+        ...collection,
+        ...options,
+      },
     );
   };
 }

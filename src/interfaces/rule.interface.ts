@@ -1,4 +1,7 @@
-export interface IBaseFieldDecorator {
+import { SchemaType } from '../types';
+import { ArangoCreatePropertiesOptions } from '../types/properties.type';
+
+export interface IArangoSchemaRulePropertyBase {
   /**
    * Data type to validate the property in the body of the documents of each collection.
    */
@@ -13,18 +16,15 @@ export interface IBaseFieldDecorator {
    * The value of this keyword MAY be of any type, including null.
    */
   const?: any;
-
-  /**
-   * Indicates if the field is required.
-   */
-  requiredField?: boolean;
 }
 
-export interface IFieldDecoratorTypeBoolean extends IBaseFieldDecorator {
+export interface IArangoSchemaRulePropertyBoolean
+  extends IArangoSchemaRulePropertyBase {
   type: 'boolean';
 }
 
-export interface IFieldDecoratorTypeNumber extends IBaseFieldDecorator {
+export interface IArangoSchemaRulePropertyNumber
+  extends IArangoSchemaRulePropertyBase {
   type: 'number';
 
   /**
@@ -53,7 +53,8 @@ export interface IFieldDecoratorTypeNumber extends IBaseFieldDecorator {
   exclusiveMinimum?: number;
 }
 
-export interface IFieldDecoratorTypeString extends IBaseFieldDecorator {
+export interface IArangoSchemaRulePropertyString
+  extends IArangoSchemaRulePropertyBase {
   type: 'string';
 
   /**
@@ -72,7 +73,8 @@ export interface IFieldDecoratorTypeString extends IBaseFieldDecorator {
   pattern?: string | RegExp;
 }
 
-export interface IFieldDecoratorTypeArray extends IBaseFieldDecorator {
+export interface IArangoSchemaRulePropertyArray
+  extends IArangoSchemaRulePropertyBase {
   type: 'array';
 
   /**
@@ -103,7 +105,8 @@ export interface IFieldDecoratorTypeArray extends IBaseFieldDecorator {
   minContains?: number;
 }
 
-export interface IFieldDecoratorTypeObject extends IBaseFieldDecorator {
+export interface IArangoSchemaRulePropertyObject
+  extends IArangoSchemaRulePropertyBase {
   type: 'object';
 
   /**
@@ -128,26 +131,46 @@ export interface IFieldDecoratorTypeObject extends IBaseFieldDecorator {
   dependentRequired?: Record<string, string[]>;
 }
 
-export interface IRuleOptionsMetadata {
+export interface IArangoRule {
   /**
    * Definition of the properties of each document in the collection.
    */
-  properties: Record<
-    string,
-    | IFieldDecoratorTypeBoolean
-    | IFieldDecoratorTypeNumber
-    | IFieldDecoratorTypeString
-    | IFieldDecoratorTypeArray
-    | IFieldDecoratorTypeObject
-  >;
+  properties: ArangoCreatePropertiesOptions;
 
   /**
    * Data type used to validate properties that are not defined in 'properties'.
    */
-  additionalProperties?: { type: SchemaType };
+  additionalProperties?: { type: SchemaType } | null;
 
   /**
    * Definition of the required properties in each document of the collection.
    */
   required?: string[];
 }
+
+export interface IArangoCollectionDecoratorBaseOptions {
+  /**
+   * Indicates if the field is required.
+   */
+  requiredField?: boolean;
+}
+
+export interface IArangoRuleDecoratorBooleanOptions
+  extends IArangoCollectionDecoratorBaseOptions,
+    IArangoSchemaRulePropertyBoolean {}
+
+export interface IArangoRuleDecoratorNumberOptions
+  extends IArangoCollectionDecoratorBaseOptions,
+    IArangoSchemaRulePropertyNumber {}
+
+export interface IArangoRuleDecoratorStringOptions
+  extends IArangoCollectionDecoratorBaseOptions,
+    IArangoSchemaRulePropertyString {}
+
+export interface IArangoRuleDecoratorArrayOptions
+  extends IArangoCollectionDecoratorBaseOptions,
+    IArangoSchemaRulePropertyArray {}
+
+export interface IArangoRuleDecoratorObjectOptions
+  extends IArangoCollectionDecoratorBaseOptions,
+    IArangoSchemaRulePropertyObject {}
