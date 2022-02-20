@@ -49,22 +49,65 @@ export type SortInput<
 
 export type SelectInput<T, U = Partial<T>, V = { [K in keyof U]: true }> = V;
 
-export interface ICreateInput<T> {
-  data: T;
+export type CreateInputData<
+  T,
+  U = { _id?: string; _key?: string },
+  V = Omit<T, '_id' | '_key'>,
+> = U & V;
+
+export type UpdateInputData<
+  T,
+  U = { _id: string } | { _key: string } | { _id: string; _key: string },
+  V = Partial<Omit<T, '_id' | '_key'>>,
+> = U & V;
+
+export type ReplaceInputData<
+  T,
+  U = { _id: string } | { _key: string } | { _id: string; _key: string },
+  V = Omit<T, '_id' | '_key'>,
+> = U & V;
+
+export type RemoveInputData =
+  | { _id: string }
+  | { _key: string }
+  | { _id: string; _key: string };
+
+export interface ICreateOneInput<T> {
+  data: CreateInputData<T>;
   select?: SelectInput<T>;
 }
 
-export interface IUpdateInput<T> {
-  data: Partial<T>;
+export interface ICreateManyInput<T> {
+  data: CreateInputData<T>[];
   select?: SelectInput<T>;
 }
 
-export interface IReplaceInput<T> {
-  data: T;
+export interface IUpdateOneInput<T> {
+  data: UpdateInputData<T>;
   select?: SelectInput<T>;
 }
 
-export interface IRemoveInput<T> {
-  data: { _key: string } | { _id: string };
+export interface IUpdateManyInput<T> {
+  data: UpdateInputData<T>[];
+  select?: SelectInput<T>;
+}
+
+export interface IReplaceOneInput<T> {
+  data: ReplaceInputData<T>;
+  select?: SelectInput<T>;
+}
+
+export interface IReplaceManyInput<T> {
+  data: ReplaceInputData<T>[];
+  select?: SelectInput<T>;
+}
+
+export interface IRemoveOneInput<T> {
+  data: RemoveInputData;
+  select?: SelectInput<T>;
+}
+
+export interface IRemoveManyInput<T> {
+  data: RemoveInputData[];
   select?: SelectInput<T>;
 }

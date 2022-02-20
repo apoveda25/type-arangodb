@@ -56,6 +56,8 @@ import { Collection, Indexes } from 'type-arangodb';
   unique: true,
 })
 class EntityTest {
+  _id: string;
+  _key: string;
   name: string;
 }
 
@@ -79,6 +81,8 @@ class EntityTest {
   },
 )
 class EntityTest {
+  _id: string;
+  _key: string;
   name: string;
   username: string;
   email: string;
@@ -113,6 +117,9 @@ import { Collection, Property } from 'type-arangodb';
 // Properties of type 'string' and 'number'
 @Collection()
 class EntityTest {
+  _id: string;
+  _key: string;
+
   @Property('string')
   propertyTest1: string;
 
@@ -123,6 +130,9 @@ class EntityTest {
 // Properties of type 'string' and 'number' with min and max values. Property 'propertyTest1' is required.
 @Collection()
 class EntityTest {
+  _id: string;
+  _key: string;
+
   @Property({
     type: 'string',
     minLength: 3,
@@ -154,7 +164,7 @@ const database = client.getDatabase();
 await client.registerEntities([Entity1, Entity2, ..., EntityN]);
 
 // Get a repository from an entity
-const entity1Repository = client.getRepository<Entity1>(Entity1);
+const entity1Repository = client.getRepository<EntityTest>(EntityTest);
 ```
 
 ### Use repository
@@ -170,9 +180,11 @@ const client = new ArangoClient({
 
 // Get a repository from an entity
 class EntityTest {
-  username!: string;
-  email!: string;
-  createdAt!: number;
+  _id: string;
+  _key: string;
+  username: string;
+  email: string;
+  createdAt: number;
 }
 const entityTestRepository = client.getRepository<EntityTest>(EntityTest);
 
@@ -287,5 +299,239 @@ const numberDocuments = await entityTestRepository.count({
       ],
     },
   },
+});
+
+// Return created document
+const createdDocument = await entityTestRepository.createOne({
+  // Data must be a plain entity object
+  data: {
+    _id: 'EntityTest/123456',
+    _key: '123456',
+    username: 'usernameTest',
+    email: 'email@test.com',
+    createdAt: Date.now(),
+  },
+
+  // It can also be
+  // data: {
+  //   username: 'usernameTest',
+  //   email: 'email@test.com',
+  //   createdAt: Date.now(),
+  // },
+
+  // Select the document fields.
+  // If the 'select' object is not defined, all fields of the document are returned.
+  select: {
+    _id: true,
+    username: true,
+    email: true,
+  }
+});
+
+// Return created documents
+const createdDocuments = await entityTestRepository.createMany({
+  // Data must be a array of plain entity object
+  data: [
+    {
+      _id: 'EntityTest/123456',
+      _key: '123456',
+      username: 'usernameTest',
+      email: 'email@test.com',
+      createdAt: Date.now(),
+    }
+  ],
+
+  // It can also be
+  // data: [
+  //   {
+  //     username: 'usernameTest',
+  //     email: 'email@test.com',
+  //     createdAt: Date.now(),
+  //   }
+  // ],
+
+  // Select the document fields.
+  // If the 'select' object is not defined, all fields of the document are returned.
+  select: {
+    _id: true,
+    username: true,
+    email: true,
+  }
+});
+
+
+// Return upserted document
+const upsertedDocument = await entityTestRepository.createUpdateOne({
+  // Data must be a plain entity object
+  data: {
+    _id: 'EntityTest/123456',
+    _key: '123456',
+    username: 'usernameTest',
+    email: 'email@test.com',
+    createdAt: Date.now(),
+  },
+
+  // It can also be
+  // data: {
+  //   username: 'usernameTest',
+  //   email: 'email@test.com',
+  //   createdAt: Date.now(),
+  // },
+
+  // Select the document fields.
+  // If the 'select' object is not defined, all fields of the document are returned.
+  select: {
+    _id: true,
+    username: true,
+    email: true,
+  }
+});
+
+// Return upserted documents
+const upsertedDocuments = await entityTestRepository.createUpdateMany({
+  // Data must be a array of plain entity object
+  data: [
+    {
+      _id: 'EntityTest/123456',
+      _key: '123456',
+      username: 'usernameTest',
+      email: 'email@test.com',
+      createdAt: Date.now(),
+    }
+  ],
+
+  // It can also be
+  // data: [
+  //   {
+  //     username: 'usernameTest',
+  //     email: 'email@test.com',
+  //     createdAt: Date.now(),
+  //   }
+  // ],
+
+  // Select the document fields.
+  // If the 'select' object is not defined, all fields of the document are returned.
+  select: {
+    _id: true,
+    username: true,
+    email: true,
+  }
+});
+
+// Return updated document
+const updatedDocument = await entityTestRepository.updateOne({
+  // Data must be a plain entity object
+  data: {
+    _id: 'EntityTest/123456',
+    _key: '123456',
+    username: 'usernameTest',
+    email: 'email@test.com',
+    createdAt: Date.now(),
+  },
+
+  // Select the document fields.
+  // If the 'select' object is not defined, all fields of the document are returned.
+  select: {
+    _id: true,
+    username: true,
+    email: true,
+  }
+});
+
+// Return updated documents
+const updatedDocuments = await entityTestRepository.updateMany({
+  // Data must be a array of plain entity object
+  data: [
+    {
+      _id: 'EntityTest/123456',
+      _key: '123456',
+      username: 'usernameTest',
+      email: 'email@test.com',
+    }
+  ],
+
+  // Select the document fields.
+  // If the 'select' object is not defined, all fields of the document are returned.
+  select: {
+    _id: true,
+    username: true,
+    email: true,
+  }
+});
+
+// Return replaced document
+const replacedDocument = await entityTestRepository.replaceOne({
+  // Data must be a plain entity object
+  data: {
+    _id: 'EntityTest/123456',
+    _key: '123456',
+    username: 'usernameTest',
+    email: 'email@test.com',
+    createdAt: Date.now(),
+  },
+
+  // Select the document fields.
+  // If the 'select' object is not defined, all fields of the document are returned.
+  select: {
+    _id: true,
+    username: true,
+    email: true,
+  }
+});
+
+// Return replaced documents
+const replacedDocuments = await entityTestRepository.replaceMany({
+  // Data must be a array of plain entity object
+  data: [
+    {
+      _id: 'EntityTest/123456',
+      _key: '123456',
+      username: 'usernameTest',
+      email: 'email@test.com',
+      createdAt: Date.now(),
+    }
+  ],
+
+  // Select the document fields.
+  // If the 'select' object is not defined, all fields of the document are returned.
+  select: {
+    _id: true,
+    username: true,
+    email: true,
+  }
+});
+
+// Return removed document
+const removedDocument = await entityTestRepository.removeOne({
+  // Data must be a plain entity object
+  data: {
+    _id: 'EntityTest/123456',
+  },
+
+  // Select the document fields.
+  // If the 'select' object is not defined, all fields of the document are returned.
+  select: {
+    _id: true,
+    username: true,
+    email: true,
+  }
+});
+
+// Return removed documents
+const removedDocuments = await entityTestRepository.removeMany({
+  // Data must be a array of plain entity object
+  data: [
+    {
+      _key: '123456',
+    }
+  ],
+
+  // Select the document fields.
+  // If the 'select' object is not defined, all fields of the document are returned.
+  select: {
+    _id: true,
+    username: true,
+    email: true,
+  }
 });
 ```

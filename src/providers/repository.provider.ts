@@ -8,12 +8,16 @@ import { ArangoEntity } from '..';
 import {
   FilterInput,
   ICountInput,
-  ICreateInput,
+  ICreateManyInput,
+  ICreateOneInput,
   IFindManyInput,
   IFindOneInput,
-  IRemoveInput,
-  IReplaceInput,
-  IUpdateInput,
+  IRemoveManyInput,
+  IRemoveOneInput,
+  IReplaceManyInput,
+  IReplaceOneInput,
+  IUpdateManyInput,
+  IUpdateOneInput,
   SelectInput,
   SortInput,
 } from '../interfaces/find-input.interface';
@@ -130,7 +134,10 @@ export class ArangoRepository<T> {
    * @param  - data: The data to insert into the collection.
    * @returns The document inserted.
    */
-  async createOne({ data, select }: ICreateInput<T>): Promise<T | Partial<T>> {
+  async createOne({
+    data,
+    select,
+  }: ICreateOneInput<T>): Promise<T | Partial<T>> {
     const newNode = 'NEW';
     const cursor = await this._database.query(aql`
       INSERT ${data}
@@ -152,7 +159,7 @@ export class ArangoRepository<T> {
   async createMany({
     data,
     select,
-  }: ICreateInput<T>): Promise<T[] | Partial<T>[]> {
+  }: ICreateManyInput<T>): Promise<T[] | Partial<T>[]> {
     const node = 'node';
     const newNode = 'NEW';
     const cursor = await this._database.query(aql`
@@ -176,7 +183,7 @@ export class ArangoRepository<T> {
   async createUpdateOne({
     data,
     select,
-  }: ICreateInput<T>): Promise<T | Partial<T>> {
+  }: ICreateOneInput<T>): Promise<T | Partial<T>> {
     const newNode = 'NEW';
     const cursor = await this._database.query(aql`
       UPSERT ${data}
@@ -200,7 +207,7 @@ export class ArangoRepository<T> {
   async createUpdateMany({
     data,
     select,
-  }: ICreateInput<T>): Promise<T[] | Partial<T>[]> {
+  }: ICreateManyInput<T>): Promise<T[] | Partial<T>[]> {
     const node = 'node';
     const newNode = 'NEW';
     const cursor = await this._database.query(aql`
@@ -223,7 +230,10 @@ export class ArangoRepository<T> {
    * @param  - data
    * @returns The updated document.
    */
-  async updateOne({ data, select }: IUpdateInput<T>): Promise<T | Partial<T>> {
+  async updateOne({
+    data,
+    select,
+  }: IUpdateOneInput<T>): Promise<T | Partial<T>> {
     const newNode = 'NEW';
     const cursor = await this._database.query(aql`
       UPDATE ${data}
@@ -245,7 +255,7 @@ export class ArangoRepository<T> {
   async updateMany({
     data,
     select,
-  }: IUpdateInput<T>): Promise<T[] | Partial<T>[]> {
+  }: IUpdateManyInput<T>): Promise<T[] | Partial<T>[]> {
     const node = 'node';
     const newNode = 'NEW';
     const cursor = await this._database.query(aql`
@@ -269,7 +279,7 @@ export class ArangoRepository<T> {
   async replaceOne({
     data,
     select,
-  }: IReplaceInput<T>): Promise<T | Partial<T>> {
+  }: IReplaceOneInput<T>): Promise<T | Partial<T>> {
     const newNode = 'NEW';
     const cursor = await this._database.query(aql`
       REPLACE ${data}
@@ -291,7 +301,7 @@ export class ArangoRepository<T> {
   async replaceMany({
     data,
     select,
-  }: IReplaceInput<T>): Promise<T[] | Partial<T>[]> {
+  }: IReplaceManyInput<T>): Promise<T[] | Partial<T>[]> {
     const node = 'node';
     const newNode = 'NEW';
     const cursor = await this._database.query(aql`
@@ -315,7 +325,7 @@ export class ArangoRepository<T> {
   async removeOne({
     data,
     select,
-  }: IRemoveInput<T>): Promise<T | Partial<T>[]> {
+  }: IRemoveOneInput<T>): Promise<T | Partial<T>[]> {
     const oldNode = 'OLD';
     const cursor = await this._database.query(aql`
       REMOVE ${data}
@@ -337,7 +347,7 @@ export class ArangoRepository<T> {
   async removeMany({
     data,
     select,
-  }: IRemoveInput<T>): Promise<T[] | Partial<T>[]> {
+  }: IRemoveManyInput<T>): Promise<T[] | Partial<T>[]> {
     const node = 'node';
     const oldNode = 'OLD';
     const cursor = await this._database.query(aql`
