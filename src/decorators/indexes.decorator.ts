@@ -1,5 +1,6 @@
 import { ArangoStore } from '../metadata.store';
 import { ARANGO_INDEXES } from '../type-arangodb.constant';
+import { ClassDecoratorType } from '../types';
 import {
   ArangoCreateIndexOption,
   ArangoIndexDecoratorOption,

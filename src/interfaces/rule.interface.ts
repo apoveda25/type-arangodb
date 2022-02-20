@@ -1,3 +1,4 @@
+import { SchemaType } from '../types';
 import { ArangoCreatePropertiesOptions } from '../types/properties.type';
 
 export interface IArangoSchemaRulePropertyBase {

@@ -27,7 +27,7 @@ export class ArangoClient {
     this._database = new Database(options);
   }
 
-  get database(): Database {
+  getDatabase(): Database {
     return this._database;
   }
 

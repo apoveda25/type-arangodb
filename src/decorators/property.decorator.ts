@@ -1,6 +1,7 @@
 import { IArangoRule } from '..';
 import { ArangoStore } from '../metadata.store';
 import { ARANGO_RULES } from '../type-arangodb.constant';
+import { PropertyDecoratorType, SchemaType } from '../types';
 import { ArangoPropertyDecoratorOptions } from '../types/properties.type';
 
 export function Property(type: SchemaType): PropertyDecoratorType;

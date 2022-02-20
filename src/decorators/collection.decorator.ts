@@ -5,6 +5,7 @@ import {
 } from '..';
 import { ArangoStore } from '../metadata.store';
 import { ARANGO_COLLECTION } from '../type-arangodb.constant';
+import { ClassDecoratorType } from '../types';
 
 export function Collection(): ClassDecoratorType;
 export function Collection(name: string): ClassDecoratorType;

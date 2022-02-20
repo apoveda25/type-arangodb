@@ -1,4 +1,4 @@
-declare type SchemaType =
+export type SchemaType =
   | 'null'
   | 'boolean'
   | 'number'

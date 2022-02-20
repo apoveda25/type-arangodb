@@ -2,6 +2,7 @@ import { ValidationLevel } from 'arangojs/collection';
 import { IArangoCreateSchemaOptions, IArangoSchemaDecoratorOptions } from '..';
 import { ArangoStore } from '../metadata.store';
 import { ARANGO_SCHEMA } from '../type-arangodb.constant';
+import { ClassDecoratorType } from '../types';
 
 export function Schema(level: ValidationLevel): ClassDecoratorType;
 export function Schema(

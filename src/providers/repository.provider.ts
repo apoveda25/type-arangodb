@@ -7,6 +7,7 @@ import {
 import { ArangoEntity } from '..';
 import {
   FilterInput,
+  ICountInput,
   IFindManyInput,
   IFindOneInput,
   SelectInput,
@@ -40,6 +41,19 @@ export class ArangoRepository<T> {
     );
   }
 
+  /**
+   * Returns the collection that this edge belongs to
+   * @returns The collection used by this repository.
+   */
+  getCollection(): DocumentCollection<T> & EdgeCollection<T> {
+    return this._collection;
+  }
+
+  /**
+   * It returns the first document that matches the given filters
+   * @param  - filters: The filters to apply to the query.
+   * @returns Document or null.
+   */
   async findOne({ filters, select }: IFindOneInput<T>): Promise<T | null> {
     const node = 'node';
     const cursor = await this._database.query(aql`
@@ -55,6 +69,12 @@ export class ArangoRepository<T> {
     return cursor.reduce<T | null>((accu, curr) => curr ?? accu, null);
   }
 
+  /**
+   * It returns a cursor of nodes that match the given filters, and it sorts the results by the given
+   * sort
+   * @param  - Filters:
+   * @returns An array of objects.
+   */
   async findMany({
     filters,
     sort,
@@ -75,5 +95,26 @@ export class ArangoRepository<T> {
     `);
 
     return cursor.map<T>((node) => node);
+  }
+
+  /**
+   * It returns the number of documents in the collection that match the given filters
+   * @param  - Filters:
+   * @returns An number of documents.
+   */
+  async count({ filters }: ICountInput<T>): Promise<number> {
+    const node = 'node';
+    const cursor = await this._database.query(aql`
+      RETURN COUNT(
+        FOR ${node} IN ${this._collection}
+        ${this._filtersProvider.transform<T>(
+          (filters ?? {}) as FilterInput<T>,
+          node,
+        )}
+        RETURN ${node}
+      )
+    `);
+
+    return cursor.reduce<number>((accu, curr) => accu + curr, 0);
   }
 }

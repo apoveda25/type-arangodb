@@ -3,7 +3,7 @@ import { ArangoClient } from './client.provider';
 import { ArangoRepository } from './repository.provider';
 
 describe('ArangoClient', () => {
-  let client: ArangoClient = new ArangoClient({});
+  let client!: ArangoClient;
 
   beforeEach(async () => {
     client = new ArangoClient({});
@@ -22,7 +22,7 @@ describe('ArangoClient', () => {
       /**
        * Act
        */
-      const database = client.database;
+      const database = client.getDatabase();
 
       /**
        * Assert

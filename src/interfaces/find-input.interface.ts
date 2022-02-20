@@ -11,6 +11,10 @@ export interface IFindManyInput<T> {
   offset?: number;
 }
 
+export interface ICountInput<T> {
+  filters?: FilterInput<T>;
+}
+
 export type FilterInput<
   T,
   U = Partial<T>,

@@ -1,5 +1,6 @@
 import { SchemaOptions } from 'arangojs/collection';
 import { IArangoRule } from '.';
+import { SchemaType } from '../types';
 
 export interface IArangoSchemaDecoratorOptions
   extends Omit<SchemaOptions, 'rule'> {
