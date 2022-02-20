@@ -22,56 +22,57 @@ export class FiltersProvider {
   transform<T>(filters: FilterInput<T>, docName: string): GeneratedAqlQuery {
     const entriesFilters = Object.entries(filters ?? {}) as [
       string,
-      IFilterOperatorParser,
+      IFilterOperatorParser | string | number | boolean,
     ][];
 
-    const entriesQueries = entriesFilters.map(
-      ([key, { AND, OR, ...filtersContidions }]) => {
-        const entriesFilterOperator = Object.entries(
-          filtersContidions,
-        ) as EntriesFilterOperator[];
+    const entriesQueries = entriesFilters.map(([key, value]) => {
+      const { AND, OR, ...filtersContidions } =
+        typeof value === 'object' ? value : { equals: value, OR: [], AND: [] };
 
-        const entriesFilterOperatorAnd = AND
-          ? AND.flatMap(
-              (filterCondition) =>
-                Object.entries(filterCondition) as EntriesFilterOperator[],
-              Infinity,
-            )
-          : [];
+      const entriesFilterOperator = Object.entries(
+        filtersContidions,
+      ) as EntriesFilterOperator[];
 
-        const entriesFilterOperatorOr = OR
-          ? OR.flatMap(
-              (filterCondition) =>
-                Object.entries(filterCondition) as EntriesFilterOperator[],
-              Infinity,
-            )
-          : [];
+      const entriesFilterOperatorAnd = AND
+        ? AND.flatMap(
+            (filterCondition) =>
+              Object.entries(filterCondition) as EntriesFilterOperator[],
+            Infinity,
+          )
+        : [];
 
-        const entriesFilterOperatorQuery = this.buildFilterOperatorQueries({
-          entries: entriesFilterOperator,
-          key,
-          docName,
-        });
+      const entriesFilterOperatorOr = OR
+        ? OR.flatMap(
+            (filterCondition) =>
+              Object.entries(filterCondition) as EntriesFilterOperator[],
+            Infinity,
+          )
+        : [];
 
-        const entriesFilterOperatorAndQuery = this.buildFilterOperatorQueries({
-          entries: entriesFilterOperatorAnd,
-          key,
-          docName,
-        });
+      const entriesFilterOperatorQuery = this.buildFilterOperatorQueries({
+        entries: entriesFilterOperator,
+        key,
+        docName,
+      });
 
-        const entriesFilterOperatorOrQuery = this.buildFilterOperatorQueries({
-          entries: entriesFilterOperatorOr,
-          key,
-          docName,
-        });
+      const entriesFilterOperatorAndQuery = this.buildFilterOperatorQueries({
+        entries: entriesFilterOperatorAnd,
+        key,
+        docName,
+      });
 
-        return aql.join([
-          aql.join([...entriesFilterOperatorQuery], ' AND '),
-          aql.join([...entriesFilterOperatorAndQuery], ' AND '),
-          aql.join([...entriesFilterOperatorOrQuery], ' OR '),
-        ]);
-      },
-    );
+      const entriesFilterOperatorOrQuery = this.buildFilterOperatorQueries({
+        entries: entriesFilterOperatorOr,
+        key,
+        docName,
+      });
+
+      return aql.join([
+        aql.join([...entriesFilterOperatorQuery], ' AND '),
+        aql.join([...entriesFilterOperatorAndQuery], ' AND '),
+        aql.join([...entriesFilterOperatorOrQuery], ' OR '),
+      ]);
+    });
 
     return entriesQueries.length
       ? aql`FILTER ${aql.join([...entriesQueries], ' AND ')}`

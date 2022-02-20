@@ -18,7 +18,20 @@ export interface ICountInput<T> {
 export type FilterInput<
   T,
   U = Partial<T>,
-  V = { [K in keyof U]: IFilterOperator<U[K]> },
+  V =
+    | { [K in keyof U]: IFilterCondition<U[K]> | U[K] }
+    | {
+        AND: {
+          AND?: { [K in keyof U]: IFilterCondition<U[K]> | U[K] }[];
+          OR?: { [K in keyof U]: IFilterCondition<U[K]> | U[K] }[];
+        };
+      }
+    | {
+        OR: {
+          AND?: { [K in keyof U]: IFilterCondition<U[K]> | U[K] }[];
+          OR?: { [K in keyof U]: IFilterCondition<U[K]> | U[K] }[];
+        };
+      },
 > = V;
 
 export interface IFilterCondition<T> {
@@ -34,11 +47,6 @@ export interface IFilterCondition<T> {
   notContains?: T;
   startsWith?: T;
   endsWith?: T;
-}
-
-export interface IFilterOperator<T> extends IFilterCondition<T> {
-  AND?: IFilterCondition<T>[];
-  OR?: IFilterCondition<T>[];
 }
 
 export type SortInput<
