@@ -48,3 +48,23 @@ export type SortInput<
 > = V;
 
 export type SelectInput<T, U = Partial<T>, V = { [K in keyof U]: true }> = V;
+
+export interface ICreateInput<T> {
+  data: T;
+  select?: SelectInput<T>;
+}
+
+export interface IUpdateInput<T> {
+  data: Partial<T>;
+  select?: SelectInput<T>;
+}
+
+export interface IReplaceInput<T> {
+  data: T;
+  select?: SelectInput<T>;
+}
+
+export interface IRemoveInput<T> {
+  data: { _key: string } | { _id: string };
+  select?: SelectInput<T>;
+}
