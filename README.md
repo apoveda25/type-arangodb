@@ -6,7 +6,7 @@
 
  Type ArangoDB uses ArangoJS underneath, so it inherits all support and features from it.
 
-Install TypeArangoDB:
+## Install TypeArangoDB
 
 ```bash
 npm install type-arangodb
@@ -14,6 +14,10 @@ npm install type-arangodb
 
 ```bash
 yarn add type-arangodb
+```
+
+```bash
+pnpm install type-arangodb
 ```
 
 ## Use `type-arangodb`
@@ -200,22 +204,12 @@ const document = await entityTestRepository.findOne({
       equals: 'usernameTest',
     },
     email: {
-      OR: [
-        {
-          endsWith: '@gmail.com',
-        },
-        {
-          endsWith: '@hotmail.com',
-        },
-      ],
+      endsWith: '@hotmail.com',
     },
+    name: 'nameTest',
     createdAt: {
-      AND: [
-        {
-          lte: 1645307101225,
-          gte: 1645307101225,
-        },
-      ],
+      lte: 1645307101225,
+      gte: 1645307101225,
     },
   },
   // Select the document fields.
@@ -231,24 +225,21 @@ const documents = await entityTestRepository.findMany({
   // Filter the search for documents.
   // If the 'filter' object is not defined, no filters are applied to the search.
   filters: {
-    username: {
-      equals: 'usernameTest',
-    },
-    email: {
+    OR: {
       OR: [
         {
-          endsWith: '@gmail.com',
+          email: { endsWith: '@gmail.com' },
         },
         {
-          endsWith: '@hotmail.com',
+          email: { endsWith: '@hotmail.com' },
         },
       ],
-    },
-    createdAt: {
       AND: [
         {
-          lte: 1645307101225,
-          gte: 1645307101225,
+          createdAt: {
+            lte: 1645307101225,
+            gte: 1645307101225,
+          },
         },
       ],
     },
@@ -277,24 +268,21 @@ const numberDocuments = await entityTestRepository.count({
   // Filter the search for documents.
   // If the 'filter' object is not defined, no filters are applied to the search.
   filters: {
-    username: {
-      equals: 'usernameTest',
-    },
-    email: {
+    AND: {
       OR: [
         {
-          endsWith: '@gmail.com',
+          email: { endsWith: '@gmail.com' },
         },
         {
-          endsWith: '@hotmail.com',
+          email: { endsWith: '@hotmail.com' },
         },
       ],
-    },
-    createdAt: {
       AND: [
         {
-          lte: 1645307101225,
-          gte: 1645307101225,
+          createdAt: {
+            lte: 1645307101225,
+            gte: 1645307101225,
+          },
         },
       ],
     },
