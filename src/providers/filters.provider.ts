@@ -6,7 +6,7 @@ import {
   EqualsOperatorValue,
   GteOperatorValue,
   GtOperatorValue,
-  IFilterOperatorParser,
+  IFilterConditionParser,
   InOperatorValue,
   LteOperatorValue,
   LtOperatorValue,
@@ -16,66 +16,160 @@ import {
   StartsWithOperatorValue,
   ValueFilterOperator,
 } from '../interfaces/filters.interface';
-import { FilterInput } from '../interfaces/find-input.interface';
+import {
+  FilterInput,
+  FilterInputCondition,
+} from '../interfaces/find-input.interface';
 
 export class FiltersProvider {
-  transform<T>(filters: FilterInput<T>, docName: string): GeneratedAqlQuery {
-    const entriesFilters = Object.entries(filters ?? {}) as [
-      string,
-      IFilterOperatorParser,
-    ][];
-
-    const entriesQueries = entriesFilters.map(
-      ([key, { AND, OR, ...filtersContidions }]) => {
-        const entriesFilterOperator = Object.entries(
-          filtersContidions,
-        ) as EntriesFilterOperator[];
-
-        const entriesFilterOperatorAnd = AND
-          ? AND.flatMap(
-              (filterCondition) =>
-                Object.entries(filterCondition) as EntriesFilterOperator[],
-              Infinity,
-            )
-          : [];
-
-        const entriesFilterOperatorOr = OR
-          ? OR.flatMap(
-              (filterCondition) =>
-                Object.entries(filterCondition) as EntriesFilterOperator[],
-              Infinity,
-            )
-          : [];
-
-        const entriesFilterOperatorQuery = this.buildFilterOperatorQueries({
-          entries: entriesFilterOperator,
-          key,
-          docName,
-        });
-
-        const entriesFilterOperatorAndQuery = this.buildFilterOperatorQueries({
-          entries: entriesFilterOperatorAnd,
-          key,
-          docName,
-        });
-
-        const entriesFilterOperatorOrQuery = this.buildFilterOperatorQueries({
-          entries: entriesFilterOperatorOr,
-          key,
-          docName,
-        });
-
-        return aql.join([
-          aql.join([...entriesFilterOperatorQuery], ' AND '),
-          aql.join([...entriesFilterOperatorAndQuery], ' AND '),
-          aql.join([...entriesFilterOperatorOrQuery], ' OR '),
-        ]);
-      },
+  transform<T>(
+    { AND, OR, ...filtersInput }: FilterInput<T>,
+    docName: string,
+  ): GeneratedAqlQuery {
+    const entriesFilterOperator = this.getEntriesFilterInput<T>(
+      (filtersInput ? [filtersInput] : []) as FilterInputCondition<T>[],
     );
 
-    return entriesQueries.length
-      ? aql`FILTER ${aql.join([...entriesQueries], ' AND ')}`
-      : aql``;
+    const entriesFilterOperatorAndAnd = this.getEntriesFilterInput<T>(
+      AND && AND.AND ? AND.AND : [],
+    );
+
+    const entriesFilterOperatorAndOr = this.getEntriesFilterInput<T>(
+      AND && AND.OR ? AND.OR : [],
+    );
+
+    const entriesFilterOperatorOrOr = this.getEntriesFilterInput<T>(
+      OR && OR.OR ? OR.OR : [],
+    );
+
+    const entriesFilterOperatorOrAnd = this.getEntriesFilterInput<T>(
+      OR && OR.AND ? OR.AND : [],
+    );
+
+    const entriesFilterOperatorQueries = this.parseEntriesToQueries({
+      entries: entriesFilterOperator,
+      docName,
+    });
+
+    const entriesFilterOperatorAndAndQueries = this.parseEntriesToQueries({
+      entries: entriesFilterOperatorAndAnd,
+      docName,
+    });
+
+    const entriesFilterOperatorAndOrQueries = this.parseEntriesToQueries({
+      entries: entriesFilterOperatorAndOr,
+      docName,
+    });
+
+    const entriesFilterOperatorOrOrQueries = this.parseEntriesToQueries({
+      entries: entriesFilterOperatorOrOr,
+      docName,
+    });
+
+    const entriesFilterOperatorOrAndQueries = this.parseEntriesToQueries({
+      entries: entriesFilterOperatorOrAnd,
+      docName,
+    });
+
+    const entriesFilterOperatorQuery = this.mergeAqlQueries(
+      entriesFilterOperatorQueries,
+      'AND',
+    );
+
+    const entriesFilterOperatorAndAndQuery = this.mergeAqlQueries(
+      entriesFilterOperatorAndAndQueries,
+      'AND',
+    );
+
+    const entriesFilterOperatorAndOrQuery = this.mergeAqlQueries(
+      entriesFilterOperatorAndOrQueries,
+      'OR',
+    );
+
+    const entriesFilterOperatorOrOrQuery = this.mergeAqlQueries(
+      entriesFilterOperatorOrOrQueries,
+      'OR',
+    );
+
+    const entriesFilterOperatorOrAndQuery = this.mergeAqlQueries(
+      entriesFilterOperatorOrAndQueries,
+      'AND',
+    );
+
+    const entriesFilterOperatorAndQuery = this.mergeAqlQueries(
+      [entriesFilterOperatorAndAndQuery, entriesFilterOperatorAndOrQuery],
+      'AND',
+    );
+
+    const entriesFilterOperatorOrQuery = this.mergeAqlQueries(
+      [entriesFilterOperatorOrOrQuery, entriesFilterOperatorOrAndQuery],
+      'OR',
+    );
+
+    const filterOperator = this.buildFilterAqlQuery(entriesFilterOperatorQuery);
+
+    const filterOperatorAnd = this.buildFilterAqlQuery(
+      entriesFilterOperatorAndQuery,
+    );
+
+    const filterOperatorOr = this.buildFilterAqlQuery(
+      entriesFilterOperatorOrQuery,
+    );
+
+    return aql`
+      ${filterOperator}
+      ${filterOperatorAnd}
+      ${filterOperatorOr}
+    `;
+  }
+
+  private getEntriesFilterInput<T>(
+    filtersInput: FilterInputCondition<T>[],
+  ): [string, IFilterConditionParser | string | number | boolean][] {
+    return filtersInput.flatMap((input) => {
+      return Object.entries(input ?? {}) as [
+        string,
+        IFilterConditionParser | string | number | boolean,
+      ][];
+    }, Infinity);
+  }
+
+  private parseEntriesToQueries({
+    entries,
+    docName,
+  }: {
+    entries: [string, string | number | boolean | IFilterConditionParser][];
+    docName: string;
+  }): GeneratedAqlQuery[] {
+    return entries.map(([key, value]) => {
+      const filterOperator =
+        typeof value === 'object' ? value : { equals: value };
+
+      const entriesFilterOperator = Object.entries(
+        filterOperator,
+      ) as EntriesFilterOperator[];
+
+      const entriesFilterOperatorQuery = this.buildFilterOperatorQueries({
+        entries: entriesFilterOperator,
+        key,
+        docName,
+      });
+
+      return aql.join([...entriesFilterOperatorQuery], ' AND ');
+    });
+  }
+
+  private mergeAqlQueries(
+    queries: GeneratedAqlQuery[],
+    separator: 'AND' | 'OR',
+  ): GeneratedAqlQuery {
+    const queriesFiltered = queries.filter(({ query }) => query);
+
+    return aql.join(queriesFiltered, ` ${separator} `);
+  }
+
+  private buildFilterAqlQuery(query: GeneratedAqlQuery): GeneratedAqlQuery {
+    return query.query ? aql`FILTER ${query}` : aql``;
   }
 
   private buildFilterOperator({
@@ -191,84 +285,84 @@ export class FiltersProvider {
   }
 
   private equalsTransform(
-    value: IFilterOperatorParser['equals'],
+    value: IFilterConditionParser['equals'],
     { key, docName }: { key: string; docName: string },
   ): GeneratedAqlQuery {
     return aql`${docName}.${key} == ${value}`;
   }
 
   private notTransform(
-    value: IFilterOperatorParser['not'],
+    value: IFilterConditionParser['not'],
     { key, docName }: { key: string; docName: string },
   ): GeneratedAqlQuery {
     return aql`${docName}.${key} != ${value}`;
   }
 
   private inTransform(
-    value: IFilterOperatorParser['in'],
+    value: IFilterConditionParser['in'],
     { key, docName }: { key: string; docName: string },
   ): GeneratedAqlQuery {
     return aql`${docName}.${key} IN ${value}`;
   }
 
   private notInTransform(
-    value: IFilterOperatorParser['notIn'],
+    value: IFilterConditionParser['notIn'],
     { key, docName }: { key: string; docName: string },
   ): GeneratedAqlQuery {
     return aql`${docName}.${key} NOT IN ${value}`;
   }
 
   private ltTransform(
-    value: IFilterOperatorParser['lt'],
+    value: IFilterConditionParser['lt'],
     { key, docName }: { key: string; docName: string },
   ): GeneratedAqlQuery {
     return aql`${docName}.${key} < ${value}`;
   }
 
   private lteTransform(
-    value: IFilterOperatorParser['lte'],
+    value: IFilterConditionParser['lte'],
     { key, docName }: { key: string; docName: string },
   ): GeneratedAqlQuery {
     return aql`${docName}.${key} <= ${value}`;
   }
 
   private gtTransform(
-    value: IFilterOperatorParser['gt'],
+    value: IFilterConditionParser['gt'],
     { key, docName }: { key: string; docName: string },
   ): GeneratedAqlQuery {
     return aql`${docName}.${key} > ${value}`;
   }
 
   private gteTransform(
-    value: IFilterOperatorParser['gte'],
+    value: IFilterConditionParser['gte'],
     { key, docName }: { key: string; docName: string },
   ): GeneratedAqlQuery {
     return aql`${docName}.${key} >= ${value}`;
   }
 
   private containsTransform(
-    value: IFilterOperatorParser['contains'],
+    value: IFilterConditionParser['contains'],
     { key, docName }: { key: string; docName: string },
   ): GeneratedAqlQuery {
     return aql`${docName}.${key} LIKE %${value}%`;
   }
 
   private notContainsTransform(
-    value: IFilterOperatorParser['notContains'],
+    value: IFilterConditionParser['notContains'],
     { key, docName }: { key: string; docName: string },
   ): GeneratedAqlQuery {
     return aql`${docName}.${key} NOT LIKE %${value}%`;
   }
 
   private startsWithTransform(
-    value: IFilterOperatorParser['startsWith'],
+    value: IFilterConditionParser['startsWith'],
     { key, docName }: { key: string; docName: string },
   ): GeneratedAqlQuery {
     return aql`${docName}.${key} LIKE ${value}%`;
   }
 
   private endsWithTransform(
-    value: IFilterOperatorParser['endsWith'],
+    value: IFilterConditionParser['endsWith'],
     { key, docName }: { key: string; docName: string },
   ): GeneratedAqlQuery {
     return aql`${docName}.${key} LIKE %${value}`;
