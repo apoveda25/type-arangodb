@@ -13,11 +13,6 @@ export interface IFilterConditionParser {
   endsWith?: string;
 }
 
-export interface IFilterOperatorParser extends IFilterConditionParser {
-  AND?: IFilterConditionParser[];
-  OR?: IFilterConditionParser[];
-}
-
 export type EqualsOperatorValue = string | number | boolean;
 export type NotOperatorValue = string | number | boolean;
 export type InOperatorValue = string[] | number[] | boolean[];
@@ -30,8 +25,6 @@ export type ContainsOperatorValue = string;
 export type NotContainsOperatorValue = string;
 export type StartsWithOperatorValue = string;
 export type EndsWithOperatorValue = string;
-export type AndOperatorValue = IFilterConditionParser[];
-export type OrOperatorValue = IFilterConditionParser[];
 
 export type EntriesFilterOperator =
   | ['equals', EqualsOperatorValue]
@@ -45,9 +38,7 @@ export type EntriesFilterOperator =
   | ['contains', ContainsOperatorValue]
   | ['notContains', NotContainsOperatorValue]
   | ['startsWith', StartsWithOperatorValue]
-  | ['endsWith', EndsWithOperatorValue]
-  | ['AND', AndOperatorValue]
-  | ['OR', OrOperatorValue];
+  | ['endsWith', EndsWithOperatorValue];
 
 export type ValueFilterOperator =
   | EqualsOperatorValue
@@ -61,6 +52,4 @@ export type ValueFilterOperator =
   | ContainsOperatorValue
   | NotContainsOperatorValue
   | StartsWithOperatorValue
-  | EndsWithOperatorValue
-  | AndOperatorValue
-  | OrOperatorValue;
+  | EndsWithOperatorValue;

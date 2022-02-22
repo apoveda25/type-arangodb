@@ -15,24 +15,26 @@ export interface ICountInput<T> {
   filters?: FilterInput<T>;
 }
 
+export type FilterInputCondition<T, U = Partial<T>> = {
+  [K in keyof U]: IFilterCondition<U[K]> | U[K];
+};
+
 export type FilterInput<
   T,
-  U = Partial<T>,
-  V =
-    | { [K in keyof U]: IFilterCondition<U[K]> | U[K] }
-    | {
-        AND: {
-          AND?: { [K in keyof U]: IFilterCondition<U[K]> | U[K] }[];
-          OR?: { [K in keyof U]: IFilterCondition<U[K]> | U[K] }[];
-        };
-      }
-    | {
-        OR: {
-          AND?: { [K in keyof U]: IFilterCondition<U[K]> | U[K] }[];
-          OR?: { [K in keyof U]: IFilterCondition<U[K]> | U[K] }[];
-        };
-      },
-> = V;
+  U = FilterInputCondition<T>,
+  V = {
+    AND?: {
+      AND?: U[];
+      OR?: U[];
+    };
+  },
+  W = {
+    OR?: {
+      AND?: U[];
+      OR?: U[];
+    };
+  },
+> = U & V & W;
 
 export interface IFilterCondition<T> {
   equals?: T;
